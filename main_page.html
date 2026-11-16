@@ -2248,7 +2248,6 @@
         touchZoom: "center",
         rotateControl: {
           position: "topright",
-
           closeOnZeroBearing: true,
         },
       }).setView([14.4788, 120.9964], 18);
@@ -2263,18 +2262,14 @@
         if (currentSnapState !== "closed") {
           closeBottomSheet();
         }
-
         setDropdownOpen(false);
       });
 
       const light_map = L.tileLayer(
         "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
-
         {
           minZoom: 0,
-
           maxZoom: 20,
-
           attribution:
             '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         },
@@ -2282,60 +2277,44 @@
 
       const dark_map = L.tileLayer(
         "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
-
         {
           minZoom: 0,
-
           maxZoom: 20,
-
           attribution:
             '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         },
       );
 
       let currentTileLayer = isDarkMode ? dark_map : light_map;
-
       currentTileLayer.addTo(oc_map);
 
       let userMarker = null;
-
       let accuracyCircle = null;
 
       const campusBuildings = [];
-
       const buildingMarkers = [];
-
       let labelsVisible = false;
 
       /* Modals */
-
       const modalOpeners = new Map();
 
       function openModal(modal, initialFocus) {
         const active = document.activeElement;
-
         modalOpeners.set(
           modal,
-
           active && active.closest && active.closest("#sideDrawer")
             ? menuToggle
             : active,
         );
-
         modal.classList.add("active");
-
         if (initialFocus) initialFocus.focus();
       }
 
       function closeModal(modal) {
         if (!modal.classList.contains("active")) return;
-
         modal.classList.remove("active");
-
         const opener = modalOpeners.get(modal);
-
         modalOpeners.delete(modal);
-
         if (
           opener &&
           document.contains(opener) &&
@@ -2354,28 +2333,20 @@
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
           const modal = document.querySelector(".modal-overlay.active");
-
           if (modal) {
             closeModal(modal);
-
             return;
           }
-
           if (sideDrawer.classList.contains("active")) {
             closeMenu();
-
             return;
           }
-
           if (currentSnapState !== "closed") {
             closeBottomSheet(true);
-
             return;
           }
-
           if (routeState) {
             clearRoute();
-
             return;
           }
         }
@@ -2384,61 +2355,44 @@
           const layer =
             document.querySelector(".modal-overlay.active") ||
             (sideDrawer.classList.contains("active") ? sideDrawer : null);
-
           if (!layer) return;
 
           const focusable = layer.querySelectorAll(
             "button:not([disabled]), input, textarea, a[href]",
           );
-
           if (!focusable.length) return;
-
           const first = focusable[0];
-
           const last = focusable[focusable.length - 1];
 
           if (e.shiftKey && document.activeElement === first) {
             e.preventDefault();
-
             last.focus();
           } else if (!e.shiftKey && document.activeElement === last) {
             e.preventDefault();
-
             first.focus();
           }
         }
       });
 
       /* Bottom Sheet Logic */
-
       let activeBuildingData = null;
-
       let currentSnapState = "closed";
-
       let startY = 0;
-
       let currentY = 0;
-
       let initialTransformY = 0;
-
       let isDragging = false;
-
       let sheetOpener = null;
 
       const safeAreaProbe = document.createElement("div");
-
       safeAreaProbe.style.cssText =
         "position:fixed;left:0;bottom:0;width:0;height:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none;";
-
       document.body.appendChild(safeAreaProbe);
 
       /* The peek height is the real height of the drag area (handle, title, badges, button and safe area) */
-
       function getPeekHeight() {
         const measured = Math.ceil(
           sheetDragArea.getBoundingClientRect().height,
         );
-
         return measured > 0
           ? measured
           : PEEK_FALLBACK_PX + safeAreaProbe.offsetHeight;
@@ -2450,489 +2404,322 @@
 
       function snapToState(state) {
         currentSnapState = state;
-
         isDragging = false;
-
         bottomSheet.classList.remove("dragging");
-
         bottomSheet.style.transition = "";
 
         document.documentElement.style.setProperty(
           "--peek-height",
-
           getPeekHeight() + "px",
         );
 
         if (state === "expanded") {
           bottomSheet.style.transform = "translateY(0px)";
-
           bottomSheetOverlay.classList.add("active");
         } else if (state === "peek") {
           bottomSheet.style.transform = `translateY(${getPeekOffsetY()}px)`;
-
           bottomSheetOverlay.classList.remove("active");
         } else {
           bottomSheet.style.transform = "translateY(100%)";
-
           bottomSheetOverlay.classList.remove("active");
         }
 
         bottomSheet.inert = state === "closed";
-
         sheetContent.inert = state !== "expanded";
 
         sheetToggleBtn.setAttribute(
           "aria-expanded",
-
           String(state === "expanded"),
         );
-
         sheetToggleBtn.setAttribute(
           "aria-label",
-
           state === "expanded" ? "Collapse details" : "Expand details",
         );
 
         document.body.classList.remove("sheet-peek", "sheet-expanded");
-
         if (state !== "closed") document.body.classList.add("sheet-" + state);
       }
 
       /* Building directories: dropdown per floor/section with room names.
-
          Keyed by building id. Rooms are [number/code, name]; either can be "".
-
          A section has one or more groups (e.g. Left Side / Middle / Right Side). */
-
       const G = (rooms, label = null) => ({ label, rooms });
-
       const BUILDING_DIRECTORY = {
         OC_ELO: [
           {
             label: "Floor 1",
-
             groups: [
               G([
                 ["", "Security Department"],
-
                 ["", "CHOW"],
               ]),
             ],
           },
-
           {
             label: "Floor 2",
-
             groups: [
               G([
                 ["", "Cashier"],
-
                 ["", "Board Room"],
-
                 ["201", "Registrar's Office"],
-
                 ["202", "Office of the Vice President"],
               ]),
             ],
           },
-
           {
             label: "Floor 3",
-
             groups: [
               G([
                 ["307", "Faculty Room"],
-
                 ["308", "Education Lab 2"],
-
                 ["309", "Education Lab 1"],
               ]),
             ],
           },
-
           {
             label: "Floor 4",
-
             groups: [
               G([
                 ["402", "Consultation Room"],
-
                 ["402", "Business Administration Lab"],
-
                 ["403", "Accountancy Lab"],
-
                 ["404", "Customs Administration Lab"],
-
                 ["409", "Faculty Room"],
               ]),
             ],
           },
-
           {
             label: "Floor 5",
-
             groups: [
               G([
                 ["506", "Faculty Room"],
-
                 ["509", "Faculty Room"],
-
                 ["513", "Conference Room"],
               ]),
             ],
           },
-
           {
             label: "Floor 6",
-
             groups: [
               G([
                 ["609", "IT Department"],
-
                 ["610", "TESDA Laboratories"],
-
                 ["612", "Computer Laboratory 1 (CL1)"],
-
                 ["613", "Computer Laboratory 2 (CL2)"],
-
                 ["614", "Computer Laboratory 3 (CL3)"],
               ]),
             ],
           },
-
           {
             label: "Floor 7",
-
             groups: [
               G([
                 ["701", "Isolation Room"],
-
                 ["702", "Pharmacy Central Supply"],
-
                 ["707", "Conference Room"],
-
                 ["710", "Emergency Room"],
               ]),
             ],
           },
-
           {
             label: "Floor 8",
-
             groups: [
               G([
                 ["805", "Faculty Room"],
-
                 ["807", "Library"],
-
                 ["808", "Faculty Room"],
-
                 ["809", "Defense Room"],
-
                 ["810", "Quality Assurance Office"],
-
                 ["811", "Office Records Room"],
               ]),
             ],
           },
-
           { label: "Floor 10", groups: [G([["", "Gymnasium"]])] },
         ],
-
         OC_ADL: [
           {
             label: "4th Floor – Nursing",
-
             groups: [
               G([
                 ["", "12 Commitment"],
-
                 ["", "12 Compassion"],
-
                 ["", "12 Cooperation"],
-
                 ["", "X-ray Lab"],
-
                 ["", "Ultrasound Lab / ADL 4"],
-
                 ["", "Radiologic Technology Faculty / ADL 407"],
-
                 ["ADL 408", "Nursing Arts Lab 3"],
-
                 ["", "Nursing Arts Lab 3 – Lecture Room"],
-
                 ["", "ADL 4 – Lecture Room"],
-
                 ["", "Lab 5 – Lecture Room"],
-
                 ["", "Lab 6"],
               ]),
             ],
           },
         ],
-
         OC_IBED: [
           {
             label: "Rooms",
-
             groups: [
               G([
                 ["RLO 206", "Laboratory Office"],
-
                 ["RLO 210", ""],
-
                 ["RLO 209", ""],
-
                 ["RLO 208", "Science Laboratory"],
-
                 ["RLO 207", "Student Affairs and Service Office"],
-
                 ["RLO 201", ""],
-
                 ["RLO 202", ""],
-
                 ["RLO 203", ""],
-
                 ["RLO 204", "Grade Learning Resource Center / School Center"],
-
                 ["RLO 205", ""],
-
                 ["", "Comfort Room (CR)"],
               ]),
             ],
           },
         ],
-
         OC_CASA: [
           {
             label: "1st Floor",
-
             groups: [G([["AL 103", "Cookery NC II Assessment Center"]])],
           },
         ],
-
         OC_DPRO: [
           {
             label: "1st Floor",
-
             groups: [
               G([
                 ["PRO 116", ""],
-
                 ["PRO 117", ""],
-
                 ["PRO 118", ""],
-
                 ["PRO 119", ""],
-
                 ["PRO 120", "DPRO SHS Faculty Room"],
-
                 ["", "CR 1"],
-
                 ["", "CR 2"],
               ]),
-
               G([
                 ["SDL 115", ""],
-
                 ["PRO 114", ""],
-
                 ["PRO 113", ""],
-
                 ["PRO 112", "Faculty Room"],
-
                 ["PRO 110", ""],
-
                 ["PRO 109", ""],
-
                 ["PRO 108", ""],
               ]),
-
               G([
                 ["PRO 101", ""],
-
                 ["PRO 102", ""],
-
                 ["PRO 103", ""],
-
                 ["PRO 104", ""],
-
                 ["PRO 105", ""],
-
                 ["PRO 106", ""],
-
                 ["PRO 107", ""],
               ]),
             ],
           },
-
           {
             label: "2nd Floor",
-
             groups: [
               G([
                 ["PRO 201", ""],
-
                 ["PRO 202", ""],
-
                 ["PRO 203", ""],
-
                 ["PRO 204", ""],
-
                 ["", "CR"],
               ]),
-
               G([
                 ["SDL 207", ""],
-
                 ["PRO 206", ""],
-
                 ["PRO 205", ""],
               ]),
-
               G(
                 [
                   ["", "Storage Room"],
-
                   ["", "Multimedia Room"],
-
                   ["", "Computer / Internet Section"],
-
                   ["", "Discussion Room"],
-
                   ["", "Filipiniana Section"],
-
                   ["", "Intensive Reading Room"],
-
                   ["", "Information and Acquisition Section"],
-
                   ["", "Research Office"],
-
                   ["", "General Reference and Serial Section"],
-
                   ["", "Special Collection Section"],
                 ],
-
                 "Library",
               ),
             ],
           },
-
           {
             label: "3rd Floor",
-
             groups: [
               G([
                 ["PRO 304", "Faculty Room"],
-
                 ["PRO 303", ""],
-
                 ["PRO 302", ""],
-
                 ["PRO 301", ""],
-
                 ["", "CR"],
               ]),
-
               G([
                 ["PRO 305", ""],
-
                 ["PRO 306", ""],
-
                 ["PRO 307", ""],
-
                 ["PRO 308", "Faculty Room"],
               ]),
-
               G([
                 ["PRO 309", ""],
-
                 ["PRO 310", ""],
-
                 ["PRO 311", ""],
-
                 ["PRO 312", ""],
-
                 ["PRO 313", ""],
               ]),
-
               G(
                 [
                   ["", "Computer Laboratory 1 (COMLAB 1)"],
-
                   ["", "Computer Laboratory 2 (COMLAB 2)"],
-
                   ["", "Computer Laboratory 3 (COMLAB 3)"],
-
                   ["", "IT Department"],
-
                   ["", "Reserve and Newly Acquired Section"],
-
                   ["", "General Collection and Fiction Section"],
-
                   ["", "CR"],
                 ],
-
                 "Library",
               ),
             ],
           },
         ],
-
         OC_CRIMINOLOGY: [
           { label: "1st Floor", groups: [G([["", "Entrance"]])] },
-
           {
             label: "2nd Floor",
-
             groups: [
               G([
                 ["PO 203", ""],
-
                 ["", "Male CR"],
-
                 ["", "Photo Laboratory"],
-
                 ["PO 201", ""],
-
                 ["PO 202", "Interrogation Room"],
               ]),
             ],
           },
-
           {
             label: "3rd Floor",
-
             groups: [
               G([
                 ["PO 303", "Office of the Program Chair"],
-
                 ["", "Female CR"],
-
                 ["PO 302", "Faculty Room"],
-
                 ["PO 301", ""],
-
                 ["", "Exit"],
               ]),
             ],
           },
-
           {
             label: "4th Floor",
-
             groups: [
               G([
                 ["PO 401", "Crime Laboratory"],
-
                 ["", "General Laboratory"],
-
                 ["", "Bullet Recovery Room"],
-
                 ["PO 2", "Armory"],
-
                 ["", "Faculty Male CR"],
-
                 ["", "Faculty Female CR"],
               ]),
             ],
@@ -2941,28 +2728,19 @@
       };
 
       /* Title fallbacks, in case a building has no id in the geojson */
-
       const DIRECTORY_TITLE_TO_ID = {
         ELO: "OC_ELO",
-
         ADL: "OC_ADL",
-
         IBED: "OC_IBED",
-
         CASA: "OC_CASA",
-
         DPRO: "OC_DPRO",
-
         CRIMINOLOGY: "OC_CRIMINOLOGY",
       };
 
       function getDirectoryKey(b) {
         if (!b) return null;
-
         if (b.id && BUILDING_DIRECTORY[b.id]) return b.id;
-
         const k = DIRECTORY_TITLE_TO_ID[String(b.title || "").toUpperCase()];
-
         return k && BUILDING_DIRECTORY[k] ? k : null;
       }
 
@@ -2973,63 +2751,40 @@
 
       function renderFloorList(data) {
         const key = getDirectoryKey(data);
-
         floorList.hidden = !key;
-
         floorList.textContent = "";
-
         if (!key) return;
 
         BUILDING_DIRECTORY[key].forEach((sec, si) => {
           const details = document.createElement("details");
-
           details.className = "floor-item";
-
           if (pendingRoomFocus && pendingRoomFocus.section === si)
             details.open = true;
 
           const summary = document.createElement("summary");
-
           summary.className = "floor-summary";
-
           const label = document.createElement("span");
-
           label.textContent = sec.label;
-
           const total = sectionRoomCount(sec);
-
           const count = document.createElement("span");
-
           count.className = "floor-count";
-
           count.textContent = total + (total === 1 ? " room" : " rooms");
-
           const chevron = document.createElement("i");
-
           chevron.className = "fa-solid fa-chevron-down floor-chevron";
-
           chevron.setAttribute("aria-hidden", "true");
-
           summary.append(label, count, chevron);
 
           const ul = document.createElement("ul");
-
           ul.className = "floor-rooms";
-
           sec.groups.forEach((grp) => {
             if (grp.label) {
               const head = document.createElement("li");
-
               head.className = "floor-group-label";
-
               head.textContent = grp.label;
-
               ul.appendChild(head);
             }
-
             grp.rooms.forEach(([num, name]) => {
               const li = document.createElement("li");
-
               if (
                 pendingRoomFocus &&
                 pendingRoomFocus.section === si &&
@@ -3037,50 +2792,34 @@
                 pendingRoomFocus.name === name
               )
                 li.className = "room-hit";
-
               const numeric = /^\d+$/.test(num);
-
               if (num && (name || numeric)) {
                 const badge = document.createElement("span");
-
                 badge.className = "room-num";
-
                 badge.textContent = num;
-
                 li.appendChild(badge);
               }
-
               const txt = document.createElement("span");
-
               txt.className =
                 "room-name" + (name || !num ? "" : " room-name-plain");
-
               txt.textContent = name || (numeric ? "Room " + num : num);
-
               if (!name && numeric) txt.classList.add("room-name-plain");
-
               li.appendChild(txt);
-
               ul.appendChild(li);
             });
           });
 
           details.append(summary, ul);
-
           floorList.appendChild(details);
         });
       }
 
       function openBottomSheet(data) {
         sheetTitle.textContent = data.title || "Location Details";
-
         sheetDescription.textContent =
           data.description || "No description available.";
-
         activeBuildingData = data;
-
         refreshSheetActions();
-
         renderFloorList(data);
 
         if (!bottomSheet.contains(document.activeElement)) {
@@ -3100,33 +2839,24 @@
 
           if (imageUrls[idx]) {
             imgEl.src = imageUrls[idx];
-
             imgEl.alt = `${data.title || "Location"} photo ${idx + 1}`;
-
             imgEl.style.display = "block";
-
             if (placeholder) placeholder.style.display = "none";
           } else {
             imgEl.removeAttribute("src");
-
             imgEl.alt = "";
-
             imgEl.style.display = "none";
-
             if (placeholder) placeholder.style.display = "flex";
           }
         });
 
         sheetContent.scrollTop = 0;
-
         snapToState("peek");
-
         sheetTitle.focus({ preventScroll: true });
       }
 
       function closeBottomSheet(restoreFocus = false) {
         snapToState("closed");
-
         if (
           restoreFocus === true &&
           sheetOpener &&
@@ -3145,7 +2875,6 @@
           return;
 
         isDragging = true;
-
         startY = currentY = e.touches[0].clientY;
 
         if (currentSnapState === "expanded") {
@@ -3157,27 +2886,21 @@
         }
 
         bottomSheet.classList.add("dragging");
-
         bottomSheet.style.transition = "none";
       }
 
       function onTouchMove(e) {
         if (!isDragging) return;
-
         currentY = e.touches[0].clientY;
-
         const newTransformY = Math.max(
           0,
-
           initialTransformY + (currentY - startY),
         );
-
         bottomSheet.style.transform = `translateY(${newTransformY}px)`;
       }
 
       function onTouchEnd() {
         if (!isDragging) return;
-
         isDragging = false;
 
         const deltaY = currentY - startY;
@@ -3198,11 +2921,8 @@
       bottomSheet.addEventListener("touchstart", onTouchStart, {
         passive: true,
       });
-
       bottomSheet.addEventListener("touchmove", onTouchMove, { passive: true });
-
       bottomSheet.addEventListener("touchend", onTouchEnd);
-
       bottomSheet.addEventListener("touchcancel", () => {
         if (isDragging) snapToState(currentSnapState);
       });
@@ -3212,30 +2932,24 @@
       });
 
       bottomSheetOverlay.addEventListener("click", () => closeBottomSheet());
-
       closeSheetBtn.addEventListener("click", () => closeBottomSheet(true));
-
       sheetToggleBtn.addEventListener("click", () => {
         snapToState(currentSnapState === "expanded" ? "peek" : "expanded");
       });
 
       /* GeoJSON Buildings */
-
       const NON_NAME_KEYS = ["entrances", "perimeter", "walkway"];
 
       function getBuildingKey(props) {
         if (props.name) return "name";
-
         return (
           Object.keys(props).find((k) => !NON_NAME_KEYS.includes(k)) || null
         );
       }
 
       /* Helper to match map marker icons and colors */
-
       function getBuildingIconInfo(buildingName) {
         let iconClass = "fa-solid fa-building";
-
         let iconColor = "#0B793D";
 
         if (buildingName.includes("GYM")) {
@@ -3246,38 +2960,30 @@
           buildingName.includes("CLINIC")
         ) {
           iconClass = "fa-solid fa-hospital";
-
           iconColor = "#d9534f";
         } else if (buildingName.includes("PARKING")) {
           iconClass = "fa-solid fa-square-parking";
-
           iconColor = "#2196F3";
         } else if (
           buildingName.includes("RESORT") ||
           buildingName.includes("BOTANICAL")
         ) {
           iconClass = "fa-solid fa-landmark";
-
           iconColor = "#0B793D";
         } else if (buildingName.includes("OLI'S DEN")) {
           iconClass = "fa-solid fa-utensils";
-
           iconColor = "#0B793D";
         } else if (buildingName.includes("CAFÉ")) {
           iconClass = "fa-solid fa-mug-saucer";
-
           iconColor = "#0B793D";
         } else if (buildingName.includes("TENNIS_COURT")) {
           iconClass = "fa-solid fa-table-tennis-paddle-ball";
-
           iconColor = "#0B793D";
         } else if (buildingName.includes("POOL_AREA")) {
           iconClass = "fa-solid fa-water-ladder";
-
           iconColor = "#0B793D";
         } else if (buildingName.includes("KITCHEN")) {
           iconClass = "fa-solid fa-kitchen-set";
-
           iconColor = "#0B793D";
         }
 
@@ -3286,66 +2992,46 @@
 
       const geoLayer = L.geoJSON(geojsonData, {
         filter: (feature) => DEBUG_WALKWAYS || !feature.properties.walkway,
-
         style: function (feature) {
           const props = feature.properties;
-
           if (props.perimeter) {
             return {
               color: "#d9534f",
-
               weight: 3,
-
               dashArray: "5, 5",
-
               fill: false,
             };
           } else if (props.walkway) {
             return {
               color: "#8a8a8a",
-
               weight: 2,
-
               dashArray: "2 4",
-
               opacity: 0.8,
             };
           } else if (!getBuildingKey(props)) {
             return {
               color: "#8a8a8a",
-
               weight: 1,
-
               fillColor: "#8a8a8a",
-
               fillOpacity: 0.15,
             };
           } else if (props.PARKING) {
             return {
               color: "#2196F3",
-
               weight: 1.5,
-
               fillColor: "#2196F3",
-
               fillOpacity: 0.25,
             };
           }
-
           return {
             color: "#0B793D",
-
             weight: 1.5,
-
             fillColor: "#0B793D",
-
             fillOpacity: 0.2,
           };
         },
-
         onEachFeature: function (feature, layer) {
           const props = feature.properties;
-
           if (
             props.perimeter ||
             props.walkway ||
@@ -3354,11 +3040,9 @@
             return;
 
           const nameKey = getBuildingKey(props);
-
           if (!nameKey) return;
 
           let center = null;
-
           try {
             center = layer.getBounds().getCenter();
           } catch (e) {
@@ -3366,36 +3050,24 @@
           }
 
           const buildingName = props.name || nameKey;
-
           const buildingId = props.name ? props.id || "" : props[nameKey] || "";
 
           const doors = (props.entrances || [])
-
             .filter((e) => !/^car/i.test(e.name))
-
             .map((e) => ({
               name: e.name,
-
               latlng: L.latLng(e.coords[1], e.coords[0]),
             }));
-
           const entrances = doors.map((d) => d.latlng);
 
           const buildingObj = {
             title: buildingName,
-
             id: buildingId,
-
             description: props.description || `Building ID: ${buildingId}`,
-
             imageUrls: props.imageUrls || [],
-
             coords: center,
-
             doors,
-
             entrances: entrances.length ? entrances : center ? [center] : [],
-
             layer: layer,
           };
 
@@ -3405,15 +3077,12 @@
             if (e && e.originalEvent) {
               L.DomEvent.stopPropagation(e);
             }
-
             if (center) {
               oc_map.flyTo([center.lat, center.lng], 19, {
                 animate: true,
-
                 duration: 1.2,
               });
             }
-
             openBottomSheet(buildingObj);
           };
 
@@ -3424,30 +3093,19 @@
 
             const customIcon = L.divIcon({
               className: "map-label-marker",
-
               html: `<div class="map-label-pill" aria-hidden="true">
-
                                    <div class="map-label-icon" style="color: ${iconColor};">
-
                                        <i class="${iconClass}"></i>
-
                                    </div>
-
                                    <span class="map-label-text hide-label">${escapeHtml(buildingName)}</span>
-
                                </div>`,
-
               iconSize: null,
-
               iconAnchor: [15, 15],
             });
 
             const marker = L.marker(center, { icon: customIcon }).addTo(oc_map);
-
             marker.getElement().setAttribute("aria-label", buildingName);
-
             marker.on("click", handleBuildingClick);
-
             buildingMarkers.push(marker);
           }
         },
@@ -3456,47 +3114,32 @@
       campusBuildings.sort((a, b) => a.title.localeCompare(b.title));
 
       /* ==========================================================
-
            Walkway graph & pathfinding
-
            ========================================================== */
-
       const KX = 111320 * Math.cos((14.479 * Math.PI) / 180);
-
       const KY = 110574;
-
       const toM = (lng, lat) => [lng * KX, lat * KY];
-
       const toLL = (p) => L.latLng(p[1] / KY, p[0] / KX);
 
       function projectOnSeg(p, a, b) {
         const dx = b[0] - a[0],
           dy = b[1] - a[1],
           len2 = dx * dx + dy * dy;
-
         const t = len2
           ? Math.max(
               0,
-
               Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / len2),
             )
           : 0;
-
         const q = [a[0] + t * dx, a[1] + t * dy];
-
         return { t, d: Math.hypot(p[0] - q[0], p[1] - q[1]), p: q };
       }
 
       const gNodes = []; // [x, y] in metres
-
       const gAdj = []; // gAdj[i] = [{ to, w }]
-
       const gEdges = []; // [{ a, b, w }], one per walkable segment (used to snap GPS positions)
-
       const gEdgeKeys = new Set();
-
       let gComp = []; // connected-component id per node
-
       let gMainComp = -1; // the largest component; only this one is ever used for routing
 
       function nodeFor(p) {
@@ -3504,78 +3147,55 @@
           if (Math.hypot(gNodes[i][0] - p[0], gNodes[i][1] - p[1]) < NODE_M)
             return i;
         }
-
         gNodes.push(p);
-
         gAdj.push([]);
-
         return gNodes.length - 1;
       }
 
       function addEdge(a, b) {
         if (a === b) return;
-
         const key = a < b ? `${a}-${b}` : `${b}-${a}`;
-
         if (gEdgeKeys.has(key)) return;
-
         gEdgeKeys.add(key);
-
         const w = Math.hypot(
           gNodes[a][0] - gNodes[b][0],
-
           gNodes[a][1] - gNodes[b][1],
         );
-
         gAdj[a].push({ to: b, w });
-
         gAdj[b].push({ to: a, w });
-
         gEdges.push({ a, b, w });
       }
 
       (function buildWalkGraph() {
         const lines = geojsonData.features
-
           .filter(
             (f) => f.properties.walkway && f.geometry.type === "LineString",
           )
-
           .map((f) => f.geometry.coordinates.map((c) => toM(c[0], c[1])));
 
         lines.forEach((pts, li) => {
           let prev = null;
-
           const visit = (p) => {
             const id = nodeFor(p);
-
             if (prev !== null) addEdge(prev, id);
-
             prev = id;
           };
 
           visit(pts[0]);
-
           for (let s = 0; s < pts.length - 1; s++) {
             const a = pts[s],
               b = pts[s + 1],
               extra = [];
-
             // A vertex of another line that sits on this segment is a junction
-
             lines.forEach((other, lj) => {
               if (lj === li) return;
-
               other.forEach((v) => {
                 const { t, d } = projectOnSeg(v, a, b);
-
                 if (d < JUNCTION_M && t > 0.02 && t < 0.98)
                   extra.push({ t, v });
               });
             });
-
             extra.sort((x, y) => x.t - y.t).forEach((e) => visit(e.v));
-
             visit(b);
           }
         });
@@ -3583,39 +3203,26 @@
 
       (function labelComponents() {
         gComp = new Array(gNodes.length).fill(-1);
-
         const sizes = [];
-
         for (let s = 0; s < gNodes.length; s++) {
           if (gComp[s] !== -1) continue;
-
           const id = sizes.length;
-
           let size = 0;
-
           const stack = [s];
-
           gComp[s] = id;
-
           while (stack.length) {
             const u = stack.pop();
-
             size++;
-
             gAdj[u].forEach(({ to }) => {
               if (gComp[to] === -1) {
                 gComp[to] = id;
-
                 stack.push(to);
               }
             });
           }
-
           sizes.push(size);
         }
-
         gMainComp = sizes.indexOf(Math.max(...sizes));
-
         if (sizes.length > 1) {
           console.warn(
             `Walkway network has ${sizes.length} separate pieces; only the largest is used.`,
@@ -3625,95 +3232,68 @@
 
       function nearestNode(latlng, maxM = ENTRANCE_SNAP_M) {
         const p = toM(latlng.lng, latlng.lat);
-
         let best = null;
-
         for (let i = 0; i < gNodes.length; i++) {
           if (gComp[i] !== gMainComp) continue;
-
           const d = Math.hypot(gNodes[i][0] - p[0], gNodes[i][1] - p[1]);
-
           if (d <= maxM && (!best || d < best.d)) best = { node: i, d };
         }
-
         return best;
       }
 
       function snapToNetwork(latlng, maxM) {
         const p = toM(latlng.lng, latlng.lat);
-
         let best = null;
-
         for (const e of gEdges) {
           if (gComp[e.a] !== gMainComp) continue;
-
           const { t, d, p: q } = projectOnSeg(p, gNodes[e.a], gNodes[e.b]);
-
           if (d <= maxM && (!best || d < best.d))
             best = { edge: e, t, d, point: q };
         }
-
         return best;
       }
 
       /* A "source" is where a route can start, a "target" where it can end.
-
            leg = metres from the real point to the walkway node, lead/tail = the polyline for that leg. */
-
       function doorSource(latlng) {
         const hit = nearestNode(latlng);
-
         return hit ? { node: hit.node, leg: hit.d, lead: [latlng] } : null;
       }
 
       function doorTarget(latlng) {
         const hit = nearestNode(latlng);
-
         return hit ? { node: hit.node, leg: hit.d, tail: [latlng] } : null;
       }
 
       /* A GPS fix is snapped to the nearest point ALONG a walkway, so it can start mid-segment */
-
       function gpsSources(latlng) {
         const snap = snapToNetwork(latlng, MAX_OFF_NETWORK_M);
-
         if (!snap) return null;
-
         const { edge, t, d, point } = snap;
-
         const lead = [latlng, toLL(point)];
-
         return [
           { node: edge.a, leg: d + t * edge.w, lead },
-
           { node: edge.b, leg: d + (1 - t) * edge.w, lead },
         ];
       }
 
       /* Multi-source Dijkstra: finds the best (source, target) pair in one pass */
-
       function planRoute(sources, targets) {
         const n = gNodes.length;
-
         const dist = new Array(n).fill(Infinity);
-
         const prev = new Array(n).fill(-1);
-
         const root = new Array(n).fill(-1);
-
         const done = new Array(n).fill(false);
 
         sources.forEach((s, i) => {
           if (s.leg < dist[s.node]) {
             dist[s.node] = s.leg;
-
             root[s.node] = i;
           }
         });
 
         for (;;) {
           let u = -1;
-
           for (let i = 0; i < n; i++) {
             if (
               !done[i] &&
@@ -3722,68 +3302,48 @@
             )
               u = i;
           }
-
           if (u === -1) break;
-
           done[u] = true;
-
           for (const { to, w } of gAdj[u]) {
             if (dist[u] + w < dist[to]) {
               dist[to] = dist[u] + w;
-
               prev[to] = u;
-
               root[to] = root[u];
             }
           }
         }
 
         let best = null;
-
         targets.forEach((t) => {
           const total = dist[t.node] + t.leg;
-
           if (total < Infinity && (!best || total < best.total))
             best = { t, total };
         });
-
         if (!best) return null;
 
         const nodes = [];
-
         for (let u = best.t.node; u !== -1; u = prev[u]) nodes.push(u);
-
         nodes.reverse();
-
         const src = sources[root[nodes[0]]];
 
         return {
           distance: best.total,
-
           path: [
             ...src.lead,
-
             ...nodes.map((i) => toLL(gNodes[i])),
-
             ...best.t.tail,
           ],
-
           start: src.lead[0],
-
           snap: src.lead.length > 1 ? src.lead[src.lead.length - 1] : null,
-
           end: best.t.tail[best.t.tail.length - 1],
         };
       }
 
       /* origin is { source: 'qr' | 'manual', building, points } or { source: 'gps', latlng } */
-
       function computeRoute(origin, target) {
         let sources;
-
         if (origin.source === "gps") {
           sources = gpsSources(origin.latlng);
-
           if (!sources) {
             return {
               error:
@@ -3792,7 +3352,6 @@
           }
         } else {
           sources = origin.points.map(doorSource).filter(Boolean);
-
           if (!sources.length)
             return {
               error: `Can't find a walkway near ${origin.building.title}.`,
@@ -3800,173 +3359,106 @@
         }
 
         const targets = target.entrances.map(doorTarget).filter(Boolean);
-
         if (!targets.length)
           return { error: `Can't find a walkway near ${target.title}.` };
 
         const route = planRoute(sources, targets);
-
         if (!route)
           return { error: `No walkable path found to ${target.title}.` };
 
         /* Like Google Maps: a walker close to a walkway is drawn ON it, and the line starts at the dot,
-
            so the part already walked disappears behind them. */
-
         if (origin.source === "gps" && route.snap) {
           const off = origin.latlng.distanceTo(route.snap);
-
           if (off <= SNAP_DOT_M) {
             route.path = route.path.slice(1);
-
             route.start = route.snap;
-
             route.dot = route.snap;
-
             route.distance = Math.max(0, route.distance - off);
           }
         }
-
         return { route };
       }
 
       /* Route state & display */
-
       const STYLE_HERE = {
         color: "#f59e0b",
-
         weight: 3,
-
         fillColor: "#f59e0b",
-
         fillOpacity: 0.45,
       };
-
       const STYLE_DEST = {
         color: "#2563eb",
-
         weight: 3,
-
         fillColor: "#2563eb",
-
         fillOpacity: 0.35,
       };
 
       /* Google-Maps style "you are here": blue dot + a beam that points where the phone is facing.
-
          .gm-center / .gm-axis are invisible probes used to measure the icon's real on-screen rotation. */
-
       const USER_ICON = L.divIcon({
         className: "gm-user",
-
         html: '<div class="gm-beam"></div><div class="gm-dot"></div><i class="gm-center"></i><i class="gm-axis"></i>',
-
         iconSize: [64, 64],
-
         iconAnchor: [32, 32],
       });
-
       /* Invisible marker 40 m north of the dot, used to find where north points on a rotated map */
-
       const NORTH_REF_ICON = L.divIcon({
         className: "gm-ref",
-
         html: "",
-
         iconSize: [2, 2],
-
         iconAnchor: [1, 1],
       });
-
       const HERE_ICON = L.divIcon({
         className: "here-marker",
-
         html: "<span></span>",
-
         iconSize: [44, 44],
-
         iconAnchor: [22, 22],
       });
-
       const END_ICON = L.divIcon({
         className: "route-end-marker",
-
         html: '<span><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i></span>',
-
         iconSize: [30, 30],
-
         iconAnchor: [15, 15],
       });
 
       const hereChip = $("hereChip");
-
       const hereChipIcon = $("hereChipIcon");
-
       const hereChipText = $("hereChipText");
-
       const clearOriginBtn = $("clearOriginBtn");
-
       const appHeader = $("appHeader");
-
       const tripCard = $("tripCard");
-
       const tripFromBtn = $("tripFromBtn");
-
       const tripFromText = $("tripFromText");
-
       const tripToBtn = $("tripToBtn");
-
       const tripToText = $("tripToText");
-
       const tripTime = $("tripTime");
-
       const tripDist = $("tripDist");
-
       const routeAnnouncer = $("routeAnnouncer");
-
       const startHereBtn = $("startHereBtn");
-
       const toastEl = $("toast");
 
       let pinnedOrigin = null; // set by a QR scan or "Start from here"; always wins over GPS
-
       let hereMarker = null;
-
       let routeLine = null;
-
       let routeCasing = null;
-
       let routeStartDot = null;
-
       let routeEndMarker = null;
-
       let routeTarget = null;
-
       let routeState = null; // { target, originSource, from, distance }
-
       let pendingTarget = null; // destination to route to as soon as a GPS fix arrives
-
       let arrivedFor = null;
-
       let toastTimer = null;
-
       let navDot = null; // where the dot is drawn while navigating (pinned to the walkway)
-
       let locMode = null; // "on" | "off" | null, from the index page
-
       let lastOriginKind = null; // "gps" | "pin" | null
 
       const gps = {
         watchId: null,
-
         fix: null,
-
         recenter: false,
-
         denied: false,
-
         lastErrorAt: 0,
-
         weakNotified: false,
       };
 
@@ -3977,13 +3469,11 @@
           return null;
         }
       }
-
       function storeSet(key, value) {
         try {
           sessionStorage.setItem(key, value);
         } catch (e) {}
       }
-
       function storeRemove(key) {
         try {
           sessionStorage.removeItem(key);
@@ -3992,18 +3482,14 @@
 
       function showToast(message) {
         toastEl.textContent = message;
-
         toastEl.classList.add("show");
-
         clearTimeout(toastTimer);
-
         toastTimer = setTimeout(() => toastEl.classList.remove("show"), 4000);
       }
 
       function formatRoute(distance) {
         return {
           metres: Math.round(distance),
-
           minutes: Math.max(1, Math.round(distance / WALK_SPEED_MS / 60)),
         };
       }
@@ -4019,110 +3505,76 @@
       }
 
       /* Where does a new route start?
-
          1. "Start from here" (manual) always wins.
-
          2. Live location, once it is accurate and on the campus walkways.
-
          3. The QR code's building: the stand-in while location is off, still searching, or weak. */
-
       function getOrigin() {
         if (pinnedOrigin && pinnedOrigin.source === "manual")
           return pinnedOrigin;
-
         if (gpsOnCampus())
           return {
             source: "gps",
-
             latlng: gps.fix.latlng,
-
             accuracy: gps.fix.accuracy,
           };
-
         return pinnedOrigin;
       }
 
       function pinIsActive() {
         const o = getOrigin();
-
         return !!o && o.source !== "gps";
       }
 
       function applyHighlights() {
         campusBuildings.forEach((b) => geoLayer.resetStyle(b.layer));
-
         const pin = pinIsActive();
-
         if (pin) pinnedOrigin.building.layer.setStyle(STYLE_HERE);
-
         if (routeTarget) routeTarget.layer.setStyle(STYLE_DEST);
-
         if (hereMarker) hereMarker.setOpacity(pin ? 1 : 0);
       }
 
       /* Called whenever the fix changes: switches between "QR building" and "live location" */
-
       function refreshOriginMode() {
         const o = getOrigin();
-
         const kind = o ? (o.source === "gps" ? "gps" : "pin") : null;
-
         if (kind === lastOriginKind) return;
-
         lastOriginKind = kind;
-
         applyHighlights();
-
         updateHereChip();
-
         refreshSheetActions();
       }
 
       function updateDestinationBtn() {
         const b = activeBuildingData;
-
         let icon = "fa-location-arrow",
           label = "Go to Destination",
           disabled = false;
-
         if (b && pinIsActive() && pinnedOrigin.building === b) {
           icon = "fa-location-dot";
-
           label = "You are here";
-
           disabled = true;
         } else if (b && routeTarget === b) {
           icon = "fa-xmark";
-
           label = "Clear route";
         }
-
         goToDestinationBtn.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i> ${label}`;
-
         goToDestinationBtn.disabled = disabled;
       }
 
       function updateStartHereBtn() {
         const b = activeBuildingData;
-
         startHereBtn.hidden =
           !b || !!(pinIsActive() && pinnedOrigin.building === b);
       }
 
       /* Time and distance badges only belong to the building the route leads to */
-
       function updateSheetStats() {
         const show = !!(routeState && activeBuildingData === routeState.target);
-
         sheetTimeBadge.hidden = !show;
-
         sheetDistanceBadge.hidden = !show;
-
         if (show) {
           const { metres, minutes } = formatRoute(routeState.distance);
-
           sheetDistanceText.textContent = `${metres} m`;
-
           sheetTimeText.textContent = `${minutes} min`;
         }
       }
@@ -4133,11 +3585,8 @@
 
       function refreshSheetActions() {
         updateDestinationBtn();
-
         updateStartHereBtn();
-
         updateSheetStats();
-
         refreshPeek();
       }
 
@@ -4146,68 +3595,47 @@
           icon = "fa-location-dot",
           label = "",
           gpsMode = false;
-
         const o = getOrigin();
-
         if (o && o.source === "gps") {
           gpsMode = true;
-
           icon = "fa-location-crosshairs";
-
           text = `Using your location · ±${Math.round(gps.fix.accuracy)} m`;
-
           label = "Turn off location";
         } else if (pinnedOrigin) {
           text = `You are at ${pinnedOrigin.building.title}`;
-
           if (gps.watchId !== null)
             text += gps.fix
               ? " · waiting for a better GPS fix"
               : " · finding exact location…";
-
           label = "Clear starting point";
         } else if (gps.fix) {
           gpsMode = true;
-
           icon = "fa-location-crosshairs";
-
           const acc = Math.round(gps.fix.accuracy);
-
           text = gpsIsUsable()
             ? `Not on the campus walkways · ±${acc} m`
             : `Weak GPS signal · ±${acc} m`;
-
           label = "Turn off location";
         } else if (gps.watchId !== null) {
           gpsMode = true;
-
           icon = "fa-location-crosshairs";
-
           text = "Finding your location…";
-
           label = "Turn off location";
         }
-
         hereChip.hidden = !text || !!routeState;
-
         hereChip.classList.toggle("is-gps", gpsMode);
-
         hereChipIcon.className = `fa-solid ${icon}`;
-
         hereChipText.textContent = text;
-
         clearOriginBtn.setAttribute("aria-label", label || "Clear");
       }
 
       /* The search bar turns into a compact trip card (from / to / time) while a route is showing */
-
       function doorLabel(name) {
         return String(name).replace(/^entrance\s*(\d+)$/i, "Entrance $1");
       }
 
       function fromLabel(origin) {
         if (origin.source === "gps") return "Your location";
-
         return origin.door
           ? `${origin.building.title} · ${doorLabel(origin.door.name)}`
           : origin.building.title;
@@ -4215,16 +3643,11 @@
 
       function updateTripCard(origin, target, distance) {
         const { metres, minutes } = formatRoute(distance);
-
         tripFromText.textContent = fromLabel(origin);
-
         tripToText.textContent = target.title;
-
         tripTime.textContent =
           distance <= ARRIVE_M ? "Arrived" : `${minutes} min`;
-
         tripDist.textContent = `${metres} m`;
-
         tripCard.dataset.origin = origin.source === "gps" ? "gps" : "pin";
       }
 
@@ -4234,11 +3657,8 @@
             preventScroll: true,
           });
         }
-
         appHeader.dataset.mode = on ? "trip" : "search";
-
         document.body.classList.toggle("trip-mode", on);
-
         if (on) setDropdownOpen(false);
       }
 
@@ -4248,59 +3668,40 @@
             if (layer) oc_map.removeLayer(layer);
           },
         );
-
         routeLine = routeCasing = routeStartDot = routeEndMarker = null;
       }
 
       function clearRoute() {
         removeRouteLayers();
-
         routeTarget = null;
-
         routeState = null;
-
         pendingTarget = null;
-
         arrivedFor = null;
-
         navDot = null;
-
         setTripMode(false);
-
         stopFollow();
-
         follow.dismissed = false;
-
         if (gps.fix) drawUserMarker(); // the dot goes back to the real fix
-
         updateHereChip();
-
         applyHighlights();
-
         refreshSheetActions();
       }
 
       function fitRoute() {
         if (!routeLine) return;
-
         const bottom =
           currentSnapState === "closed" ? 40 : getPeekHeight() + 40;
-
         const cardHeight =
           parseFloat(
             getComputedStyle(document.documentElement).getPropertyValue(
               "--trip-height",
             ),
           ) || 104;
-
         const top =
           (parseFloat(getComputedStyle(appHeader).top) || 12) + cardHeight + 16;
-
         oc_map.fitBounds(routeLine.getBounds(), {
           paddingTopLeft: [40, top],
-
           paddingBottomRight: [40, bottom],
-
           maxZoom: 20,
         });
       }
@@ -4308,14 +3709,12 @@
       function drawRoute(route, origin, target, fit) {
         const prev =
           routeState && routeState.target === target ? routeState : null;
-
         const began =
           prev && prev.began
             ? prev.began
             : origin.source === "gps"
               ? origin.latlng
               : null;
-
         const inPlace =
           !fit &&
           routeLine &&
@@ -4325,99 +3724,63 @@
 
         if (inPlace) {
           /* Live navigation: just move the line, no flicker */
-
           routeCasing.setLatLngs(route.path);
-
           routeLine.setLatLngs(route.path);
-
           routeEndMarker.setLatLng(route.end);
         } else {
           removeRouteLayers();
-
           routeCasing = L.polyline(route.path, {
             color: "#ffffff",
-
             weight: 10,
-
             opacity: 0.9,
-
             lineCap: "round",
-
             lineJoin: "round",
-
             interactive: false,
           }).addTo(oc_map);
-
           routeLine = L.polyline(route.path, {
             color: "#0B793D",
-
             weight: 3,
-
             opacity: 1,
-
             lineCap: "round",
-
             lineJoin: "round",
-
             interactive: false,
           }).addTo(oc_map);
-
           if (origin.source !== "gps") {
             routeStartDot = L.circleMarker(route.start, {
               radius: 6,
-
               color: "#0B793D",
-
               weight: 3,
-
               fillColor: "#ffffff",
-
               fillOpacity: 1,
-
               interactive: false,
             }).addTo(oc_map);
           }
-
           routeEndMarker = L.marker(route.end, {
             icon: END_ICON,
-
             interactive: false,
-
             keyboard: false,
           }).addTo(oc_map);
         }
 
         navDot = origin.source === "gps" ? route.dot || origin.latlng : null;
-
         routeTarget = target;
-
         routeState = {
           target,
-
           originSource: origin.source,
-
           from: origin.source === "gps" ? origin.latlng : null,
-
           began,
-
           distance: route.distance,
         };
 
         updateTripCard(origin, target, route.distance);
-
         setTripMode(true);
-
         updateHereChip();
 
         applyHighlights();
-
         refreshSheetActions();
-
         if (fit) {
           const { metres, minutes } = formatRoute(route.distance);
-
           routeAnnouncer.textContent = `Route to ${target.title}: ${metres} metres, about ${minutes} minute${minutes === 1 ? "" : "s"} on foot.`;
-
           fitRoute();
         }
       }
@@ -4425,18 +3788,13 @@
       function checkArrival(route, target) {
         if (route.distance <= ARRIVE_M && arrivedFor !== target) {
           arrivedFor = target;
-
           showToast(`You have arrived at ${target.title}.`);
-
           stopFollow();
         }
       }
-
       /* Why there is no starting point yet, and what to do about it */
-
       function needOrigin(target) {
         gps.weakNotified = false;
-
         if (
           gps.watchId === null &&
           locMode !== "off" &&
@@ -4444,17 +3802,13 @@
           locationSupported(true)
         ) {
           pendingTarget = target;
-
           showToast("Finding your location…");
-
           startLocation({ recenter: false });
         } else if (gps.watchId !== null && !gps.fix) {
           pendingTarget = target;
-
           showToast("Still finding your location…");
         } else if (gps.fix) {
           pendingTarget = target;
-
           showToast(
             gpsIsUsable()
               ? "You seem to be away from the campus walkways. Scan a QR code, or tap “Start from here” on your building."
@@ -4465,76 +3819,56 @@
             "Scan a QR code, or tap “Start from here” on your building, to get directions.",
           );
         }
-
         return false;
       }
 
       function routeTo(target) {
         const origin = getOrigin();
-
         if (!origin) return needOrigin(target);
-
         if (origin.building === target) {
           showToast("You are already here.");
-
           return false;
         }
 
         const result = computeRoute(origin, target);
-
         if (result.error) {
           showToast(result.error);
-
           return false;
         }
 
         arrivedFor = null;
-
         drawRoute(result.route, origin, target, true);
-
         checkArrival(result.route, target);
-
         return true;
       }
 
       goToDestinationBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-
         enableCompass(); // a tap is needed to unlock the compass on iPhones
-
         const target = activeBuildingData;
-
         if (!target) return;
-
         if (routeTarget === target) {
           clearRoute();
-
           return;
         }
-
         routeTo(target);
       });
 
       $("tripBackBtn").addEventListener("click", clearRoute);
 
       /* Tap the destination row to bring its details back; tap the start row to look at where you start */
-
       tripToBtn.addEventListener("click", () => {
         if (!routeTarget) return;
-
         if (routeTarget.coords)
           oc_map.flyTo([routeTarget.coords.lat, routeTarget.coords.lng], 19, {
             animate: true,
-
             duration: 1,
           });
-
         openBottomSheet(routeTarget);
       });
 
       tripFromBtn.addEventListener("click", () => {
         if (!routeState) return;
-
         const at =
           routeState.originSource === "gps"
             ? gps.fix && gps.fix.latlng
@@ -4542,33 +3876,24 @@
               (pinnedOrigin.door
                 ? pinnedOrigin.door.latlng
                 : pinnedOrigin.building.coords);
-
         if (at)
           oc_map.flyTo([at.lat, at.lng], 19, { animate: true, duration: 1 });
       });
 
       /* ==========================================================
-
            Starting point from a QR code or "Start from here" (location off)
-
            ========================================================== */
-
       function normalizeKey(value) {
         return String(value || "")
           .normalize("NFD")
-
           .replace(/[\u0300-\u036f]/g, "")
-
           .toLowerCase()
-
           .replace(/[^a-z0-9]+/g, "");
       }
 
       function findBuilding(raw) {
         const wanted = normalizeKey(raw);
-
         if (!wanted) return null;
-
         return (
           campusBuildings.find(
             (b) =>
@@ -4578,20 +3903,14 @@
       }
 
       /* "2", "entrance2" and "Entrance 2" all mean the second door */
-
       function findDoorIndex(building, raw) {
         if (!raw) return -1;
-
         const key = normalizeKey(raw);
-
         const byName = building.doors.findIndex(
           (d) => normalizeKey(d.name) === key,
         );
-
         if (byName >= 0) return byName;
-
         const n = parseInt(key.replace(/^entrance/, ""), 10);
-
         return Number.isInteger(n) && n >= 1 && n <= building.doors.length
           ? n - 1
           : -1;
@@ -4599,66 +3918,46 @@
 
       function setPinnedOrigin(
         building,
-
         { source = "manual", doorIndex = -1, fly = true } = {},
       ) {
         clearRoute();
-
         pendingTarget = null;
 
         const door = doorIndex >= 0 ? building.doors[doorIndex] : null;
-
         pinnedOrigin = {
           source,
-
           building,
-
           door,
-
           points: door ? [door.latlng] : building.entrances,
         };
 
         if (hereMarker) oc_map.removeLayer(hereMarker);
-
         hereMarker = null;
-
         const at = door ? door.latlng : building.coords;
-
         if (at) {
           hereMarker = L.marker(at, {
             interactive: false,
-
             keyboard: false,
-
             zIndexOffset: -1000,
-
             icon: HERE_ICON,
           }).addTo(oc_map);
-
           if (fly)
             oc_map.flyTo([at.lat, at.lng], 19, {
               animate: true,
-
               duration: 1.2,
             });
         }
 
         storeSet(
           ORIGIN_KEY,
-
           JSON.stringify({
             key: building.id || building.title,
-
             door: door ? door.name : null,
-
             source,
           }),
         );
-
         updateHereChip();
-
         applyHighlights();
-
         refreshSheetActions();
       }
 
@@ -4667,9 +3966,7 @@
           if (window.location.search) {
             history.replaceState(
               null,
-
               "",
-
               window.location.pathname + window.location.hash,
             );
           }
@@ -4678,27 +3975,18 @@
 
       function clearPinnedOrigin() {
         pinnedOrigin = null;
-
         if (hereMarker) oc_map.removeLayer(hereMarker);
-
         hereMarker = null;
-
         storeRemove(ORIGIN_KEY);
-
         stripOriginFromUrl();
-
         clearRoute();
-
         updateHereChip();
-
         applyHighlights();
-
         refreshSheetActions();
       }
 
       clearOriginBtn.addEventListener("click", () => {
         const o = getOrigin();
-
         if (o && o.source !== "gps") clearPinnedOrigin();
         else if (gps.watchId !== null) stopLocation();
         else if (pinnedOrigin) clearPinnedOrigin();
@@ -4706,67 +3994,44 @@
 
       startHereBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-
         const b = activeBuildingData;
-
         if (!b) return;
-
         setPinnedOrigin(b, { source: "manual", fly: false });
-
         showToast(
           `Starting point set to ${b.title}. Now pick where you want to go.`,
         );
       });
 
       /* ==========================================================
-
            Live location (location on)
-
            ========================================================== */
-
       function locationSupported(announce) {
         if (!("geolocation" in navigator)) {
           if (announce) showToast("This browser does not support location.");
-
           return false;
         }
-
         if (window.isSecureContext === false) {
           if (announce)
             showToast("Location only works on a secure (https) page.");
-
           return false;
         }
-
         return true;
       }
 
       const follow = { on: false, dismissed: false, flyUntil: 0 };
-
       const heading = {
         value: null, // smoothed compass bearing, degrees clockwise from north
-
         target: null,
-
         ui: 0, // unwrapped angle given to the CSS, so the beam never spins the long way round
-
         offset: 0, // north-on-screen minus icon rotation, measured from the DOM
-
         raf: 0,
-
         lastCompassAt: 0,
-
         listening: false,
-
         evt: null,
-
         tapHooked: false,
       };
-
       let northRef = null;
-
       let moveAnim = 0;
-
       let measureRaf = 0;
 
       function angleDiff(a, b) {
@@ -4778,7 +4043,6 @@
       }
 
       /* Where the dot is drawn: pinned to the walkway while navigating, otherwise the raw fix */
-
       function userDisplayLatLng() {
         return routeState && routeState.originSource === "gps" && navDot
           ? navDot
@@ -4787,156 +4051,99 @@
 
       function placeUser(ll) {
         userMarker.setLatLng(ll);
-
         if (northRef) northRef.setLatLng(northOf(ll));
       }
 
       /* Glide from one fix to the next instead of jumping, so the dot walks with the person */
-
       function moveUserMarker(to) {
         cancelAnimationFrame(moveAnim);
-
         const from = userMarker.getLatLng();
-
         const dist = from.distanceTo(to);
-
         if (dist < 0.2 || dist > 80) {
           placeUser(to);
-
           scheduleMeasure();
-
           return;
         }
-
         const t0 = performance.now();
-
         const dur = 900;
-
         const step = (now) => {
           const k = Math.min(1, (now - t0) / dur);
-
           placeUser(
             L.latLng(
               from.lat + (to.lat - from.lat) * k,
-
               from.lng + (to.lng - from.lng) * k,
             ),
           );
-
           if (k < 1) moveAnim = requestAnimationFrame(step);
           else scheduleMeasure();
         };
-
         moveAnim = requestAnimationFrame(step);
       }
 
       function drawUserMarker() {
         if (!gps.fix) return;
-
         const at = userDisplayLatLng();
-
         const radius = Math.min(gps.fix.accuracy, 150);
-
         if (!userMarker) {
           userMarker = L.marker(at, {
             icon: USER_ICON,
-
             interactive: false,
-
             keyboard: false,
-
             zIndexOffset: 900,
           }).addTo(oc_map);
-
           northRef = L.marker(northOf(at), {
             icon: NORTH_REF_ICON,
-
             interactive: false,
-
             keyboard: false,
-
             zIndexOffset: -2000,
           }).addTo(oc_map);
-
           accuracyCircle = L.circle(gps.fix.latlng, {
             radius,
-
             color: "#4285f4",
-
             weight: 1,
-
             fillColor: "#4285f4",
-
             fillOpacity: 0.12,
-
             interactive: false,
           }).addTo(oc_map);
         } else {
           moveUserMarker(at);
-
           accuracyCircle.setLatLng(gps.fix.latlng);
-
           accuracyCircle.setRadius(radius);
         }
-
         followCamera(at);
-
         scheduleMeasure();
       }
 
       function removeUserMarker() {
         cancelAnimationFrame(moveAnim);
-
         if (userMarker) oc_map.removeLayer(userMarker);
-
         if (northRef) oc_map.removeLayer(northRef);
-
         if (accuracyCircle) oc_map.removeLayer(accuracyCircle);
-
         userMarker = northRef = accuracyCircle = null;
       }
 
       /* ---- Direction beam (compass) ---- */
-
       /* Screen angles are measured from the DOM, so the beam is right whether or not the
-
          rotate plugin turns marker icons with the map. */
-
       function measureNorth() {
         measureRaf = 0;
-
         if (!userMarker || !northRef) return;
-
         const el = userMarker.getElement();
-
         const ref = northRef.getElement();
-
         if (!el || !ref) return;
-
         const c = el.querySelector(".gm-center");
-
         const a = el.querySelector(".gm-axis");
-
         if (!c || !a) return;
-
         const mid = (node) => {
           const r = node.getBoundingClientRect();
-
           return [r.left + r.width / 2, r.top + r.height / 2];
         };
-
         const [cx, cy] = mid(c);
-
         const [ax, ay] = mid(a);
-
         const [nx, ny] = mid(ref);
-
         const psi = (Math.atan2(ax - cx, -(ay - cy)) * 180) / Math.PI; // icon rotation
-
         const phi = (Math.atan2(nx - cx, -(ny - cy)) * 180) / Math.PI; // north on screen
-
         if (isFinite(psi) && isFinite(phi)) heading.offset = phi - psi;
-
         renderBeam();
       }
 
@@ -4946,21 +4153,15 @@
 
       function renderBeam() {
         if (heading.value === null || !userMarker) return;
-
         const el = userMarker.getElement();
-
         if (!el) return;
-
         heading.ui += angleDiff(heading.value + heading.offset, heading.ui);
-
         el.style.setProperty("--gm-heading", heading.ui.toFixed(1) + "deg");
-
         el.classList.add("has-heading");
       }
 
       function applyHeading() {
         heading.raf = 0;
-
         if (heading.value === null) heading.value = heading.target;
         else
           heading.value =
@@ -4968,46 +4169,35 @@
               angleDiff(heading.target, heading.value) * 0.35 +
               360) %
             360;
-
         renderBeam();
       }
 
       function feedHeading(deg, source) {
         const now = Date.now();
-
         if (source === "compass") heading.lastCompassAt = now;
         else if (now - heading.lastCompassAt < 3000) return; // compass is better while it works
-
         heading.target = ((deg % 360) + 360) % 360;
-
         if (!heading.raf) heading.raf = requestAnimationFrame(applyHeading);
       }
 
       /* Compass bearing of the direction the phone is facing, corrected for tilt (W3C method) */
-
       function tiltCompassHeading(alpha, beta, gamma) {
         const r = Math.PI / 180;
-
         const cA = Math.cos(alpha * r),
           sA = Math.sin(alpha * r),
           sB = Math.sin(beta * r),
           cB = Math.cos(beta * r),
           cG = Math.cos(gamma * r),
           sG = Math.sin(gamma * r);
-
         const rA = -cA * sG - sA * sB * cG;
-
         const rB = -sA * sG + cA * sB * cG;
-
         if (Math.abs(rA) < 1e-6 && Math.abs(rB) < 1e-6)
           return (360 - alpha) % 360;
-
         return ((Math.atan2(rA, rB) * 180) / Math.PI + 360) % 360;
       }
 
       function onOrientation(e) {
         let h = null;
-
         if (
           typeof e.webkitCompassHeading === "number" &&
           !isNaN(e.webkitCompassHeading)
@@ -5022,44 +4212,31 @@
               ? tiltCompassHeading(e.alpha, e.beta, e.gamma)
               : (360 - e.alpha) % 360;
         }
-
         if (h === null) return;
-
         const screenAngle =
           (screen.orientation && screen.orientation.angle) || 0;
-
         feedHeading(h + screenAngle, "compass");
       }
 
       function enableCompass() {
         if (heading.listening || !window.DeviceOrientationEvent) return;
-
         const evt =
           "ondeviceorientationabsolute" in window
             ? "deviceorientationabsolute"
             : "deviceorientation";
-
         const start = () => {
           if (heading.listening) return;
-
           heading.listening = true;
-
           heading.evt = evt;
-
           window.addEventListener(evt, onOrientation, true);
         };
-
         const DOE = window.DeviceOrientationEvent;
-
         if (typeof DOE.requestPermission === "function") {
           // iOS only allows this from a tap; outside a tap it simply fails quietly
-
           DOE.requestPermission()
-
             .then((state) => {
               if (state === "granted") start();
             })
-
             .catch(() => {});
         } else {
           start();
@@ -5069,100 +4246,71 @@
       function stopCompass() {
         if (heading.listening && heading.evt)
           window.removeEventListener(heading.evt, onOrientation, true);
-
         heading.listening = false;
-
         heading.value = heading.target = null;
-
         heading.ui = 0;
       }
 
       oc_map.on("move zoom rotate", scheduleMeasure);
 
       /* ---- Camera follows the walker while navigating ---- */
-
       function updateLocBtn() {
         const btn = $("myLocationBtn");
-
         btn.classList.toggle("active", follow.on);
-
         btn.setAttribute("aria-pressed", String(follow.on));
-
         btn.title = follow.on ? "Following your location" : "Go to my location";
       }
 
       function startFollow() {
         if (!gps.fix) return;
-
         follow.on = true;
-
         follow.dismissed = false;
-
         follow.flyUntil = Date.now() + 900;
-
         updateLocBtn();
-
         oc_map.flyTo(
           userDisplayLatLng(),
-
           Math.max(oc_map.getZoom(), FOLLOW_ZOOM),
-
           { animate: true, duration: 0.8 },
         );
       }
 
       function stopFollow() {
         if (!follow.on) return;
-
         follow.on = false;
-
         updateLocBtn();
       }
 
       function followCamera(at) {
         if (!follow.on || Date.now() < follow.flyUntil) return;
-
         oc_map.panTo(at, {
           animate: true,
-
           duration: 0.9,
-
           easeLinearity: 1,
-
           noMoveStart: true,
         });
       }
 
       /* Dragging the map by hand lets go of the walker (tap the crosshair to follow again) */
-
       oc_map.on("dragstart", () => {
         if (follow.on) {
           stopFollow();
-
           follow.dismissed = true;
         }
       });
 
       /* Once the walker actually starts moving, switch from the route overview to following them */
-
       function autoFollow(at) {
         if (follow.on || follow.dismissed || !routeState || !routeState.began)
           return;
-
         if (routeState.began.distanceTo(at) >= 4) startFollow();
       }
 
       /* Keep an active route in step with the walker: the line shrinks as they walk */
-
       function maybeReroute() {
         if (!routeState) return;
-
         const origin = getOrigin();
-
         if (!origin || origin.source !== "gps") return; // QR / manual routes are fixed
-
         const switching = routeState.originSource !== "gps"; // live location just took over from the QR building
-
         if (
           !switching &&
           routeState.from &&
@@ -5171,29 +4319,20 @@
           return;
 
         const target = routeState.target;
-
         const result = computeRoute(origin, target);
-
         if (result.error) return;
-
         drawRoute(result.route, origin, target, false);
-
         checkArrival(result.route, target);
-
         autoFollow(origin.latlng);
       }
 
       function onGpsFix(position) {
         const c = position.coords;
-
         gps.fix = {
           latlng: L.latLng(c.latitude, c.longitude),
-
           accuracy: c.accuracy || 9999,
-
           time: Date.now(),
         };
-
         if (typeof c.heading === "number" && !isNaN(c.heading) && c.speed > 0.8)
           feedHeading(c.heading, "gps");
 
@@ -5201,24 +4340,19 @@
 
         if (gps.recenter) {
           gps.recenter = false;
-
           if (gpsOnCampus() || !pinnedOrigin)
             oc_map.flyTo(gps.fix.latlng, Math.max(oc_map.getZoom(), 18), {
               animate: true,
-
               duration: 1.2,
             });
         }
 
         if (pendingTarget && getOrigin()) {
           const target = pendingTarget;
-
           pendingTarget = null;
-
           routeTo(target);
         } else if (pendingTarget && !gpsIsUsable() && !gps.weakNotified) {
           gps.weakNotified = true;
-
           showToast(
             `GPS signal is weak (±${Math.round(gps.fix.accuracy)} m). Waiting for a better fix, or scan a QR code / tap “Start from here”.`,
           );
@@ -5227,33 +4361,23 @@
         }
 
         drawUserMarker();
-
         updateHereChip();
       }
 
       function onGpsError(error) {
         if (error.code === error.PERMISSION_DENIED) {
           gps.denied = true;
-
           stopLocation({ remember: false });
-
           locMode = "off";
-
           storeSet(LOC_MODE_KEY, "off");
-
           showToast(
             "Location is blocked for this site. Allow it in your browser settings, or scan a QR code instead.",
           );
-
           return;
         }
-
         const now = Date.now();
-
         if (now - gps.lastErrorAt < 15000) return;
-
         gps.lastErrorAt = now;
-
         showToast(
           error.code === error.POSITION_UNAVAILABLE
             ? "No location signal. Turn on Location / GPS on your device."
@@ -5263,103 +4387,66 @@
 
       function startLocation({ recenter = false } = {}) {
         if (!locationSupported(true) || gps.watchId !== null) return;
-
         gps.denied = false;
-
         gps.recenter = recenter;
-
         locMode = "on";
-
         storeSet(LOC_MODE_KEY, "on");
-
         storeRemove(GPS_OFF_KEY);
-
         enableCompass();
-
         if (!heading.tapHooked) {
           heading.tapHooked = true;
-
           document.addEventListener("click", enableCompass); // iPhones ask for the compass on a tap
         }
-
         gps.watchId = navigator.geolocation.watchPosition(
           onGpsFix,
-
           onGpsError,
-
           {
             enableHighAccuracy: true,
-
             maximumAge: 1000,
-
             timeout: 20000,
           },
         );
-
         updateHereChip();
       }
 
       function stopLocation({ remember = true } = {}) {
         if (gps.watchId !== null) navigator.geolocation.clearWatch(gps.watchId);
-
         gps.watchId = null;
-
         gps.fix = null;
-
         gps.recenter = false;
-
         pendingTarget = null;
-
         navDot = null;
-
         stopFollow();
-
         stopCompass();
-
         removeUserMarker();
-
         if (routeState && routeState.originSource === "gps") clearRoute();
-
         if (remember) {
           locMode = "off";
-
           storeSet(LOC_MODE_KEY, "off");
-
           storeSet(GPS_OFF_KEY, "1");
         }
-
         refreshOriginMode();
-
         updateHereChip();
       }
 
       $("myLocationBtn").addEventListener("click", () => {
         enableCompass();
-
         if (gps.watchId === null) {
           startLocation({ recenter: true });
-
           return;
         }
-
         if (!gps.fix) {
           showToast("Still finding your location…");
-
           return;
         }
-
         if (routeState && routeState.originSource === "gps") {
           startFollow();
-
           return;
         }
-
         oc_map.flyTo(gps.fix.latlng, Math.max(oc_map.getZoom(), 18), {
           animate: true,
-
           duration: 1,
         });
-
         if (pinnedOrigin && pinnedOrigin.source === "manual") {
           showToast(
             `Directions start from ${pinnedOrigin.building.title}. Tap × on the chip to use your live location instead.`,
@@ -5368,39 +4455,27 @@
       });
 
       /* If the browser already allows location, start without asking again */
-
       function autoStartLocation() {
         if (storeGet(GPS_OFF_KEY) === "1" || !locationSupported(false)) return;
-
         if (!navigator.permissions || !navigator.permissions.query) return;
-
         navigator.permissions
-
           .query({ name: "geolocation" })
-
           .then((status) => {
             if (status.state === "granted") startLocation({ recenter: false });
           })
-
           .catch(() => {});
       }
 
       /* ==========================================================
-
            Start-up: QR code in the URL, or the starting point from earlier in this tab
-
            ========================================================== */
-
       function initRouting() {
         const params = new URLSearchParams(window.location.search);
 
         /* The index page tells us what the visitor chose: location on or off */
-
         const locParam = params.get("loc");
-
         if (locParam === "on" || locParam === "off") {
           locMode = locParam;
-
           storeSet(LOC_MODE_KEY, locParam);
         } else {
           locMode = storeGet(LOC_MODE_KEY);
@@ -5413,29 +4488,21 @@
           params.get("destination");
 
         let wanted = null;
-
         if (raw) {
           wanted = {
             key: raw,
-
             door: params.get("entrance") || params.get("door"),
-
             source: "qr",
-
             fromUrl: true,
           };
         } else {
           try {
             const saved = JSON.parse(storeGet(ORIGIN_KEY) || "null");
-
             if (saved && saved.key)
               wanted = {
                 key: saved.key,
-
                 door: saved.door,
-
                 source: saved.source || "manual",
-
                 fromUrl: false,
               };
           } catch (e) {}
@@ -5443,13 +4510,10 @@
 
         if (wanted) {
           const building = findBuilding(wanted.key);
-
           if (building) {
             setPinnedOrigin(building, {
               source: wanted.source,
-
               doorIndex: findDoorIndex(building, wanted.door),
-
               fly: true,
             });
           } else if (wanted.fromUrl) {
@@ -5458,31 +4522,23 @@
         }
 
         /* Location on: live position takes over from the QR building as soon as it is accurate.
-
            Location off: the QR building is the starting point and GPS stays off (the crosshair turns it on). */
-
         if (locMode === "on") startLocation({ recenter: true });
         else if (locMode !== "off") autoStartLocation();
 
         /* The QR/index params are consumed: drop them from the address bar so a refresh
-
            (or a later "Start from here" choice) is not overridden by the old ?from=.
-
            The mode and starting point are already saved for this tab. */
-
         if (window.location.search && storeGet(LOC_MODE_KEY))
           stripOriginFromUrl();
       }
 
       /* Toggle Labels */
-
       const toggleLabelsBtn = $("toggleLabelsBtn");
 
       toggleLabelsBtn.addEventListener("click", () => {
         labelsVisible = !labelsVisible;
-
         toggleLabelsBtn.classList.toggle("active", labelsVisible);
-
         toggleLabelsBtn.setAttribute("aria-pressed", String(labelsVisible));
 
         document.querySelectorAll(".map-label-text").forEach((labelEl) => {
@@ -5491,12 +4547,9 @@
       });
 
       /* Floors: M is the campus map above; F1 draws the layer_1 interior detail on top.
-
          F2 and F3 are placeholders until their plans exist. */
-
       const floor1Data = {
         type: "FeatureCollection",
-
         features: [
           {
             type: "Feature",
@@ -5509,7 +4562,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5521,7 +4573,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5533,7 +4584,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5545,7 +4595,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5557,7 +4606,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5574,7 +4622,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5591,7 +4638,6 @@
             },
             properties: { Chapel: "oc_chapel" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5608,7 +4654,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5625,7 +4670,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5642,7 +4686,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5659,7 +4702,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5676,7 +4718,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5695,7 +4736,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5712,7 +4752,6 @@
             },
             properties: { "CR Female": "oc_cr" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5729,7 +4768,6 @@
             },
             properties: { "CR MALE": "oc_cr" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5747,7 +4785,6 @@
             },
             properties: { stage: "oc_stage" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5765,7 +4802,6 @@
             },
             properties: { bleacher: "oc_bleachers" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5782,7 +4818,6 @@
             },
             properties: { bleachers: "oc_bleachers" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5799,7 +4834,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5817,7 +4851,6 @@
             },
             properties: { Stairs: "oc_stairs" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5834,7 +4867,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5851,7 +4883,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5868,7 +4899,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5885,7 +4915,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5902,7 +4931,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5919,24 +4947,22 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
               type: "Polygon",
               coordinates: [
                 [
-                  [120.99546, 14.478439],
+                  [120.9954592, 14.4784376],
                   [120.995257, 14.478532],
                   [120.995223, 14.478458],
                   [120.995421, 14.478367],
-                  [120.99546, 14.478439],
+                  [120.9954592, 14.4784376],
                 ],
               ],
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5953,7 +4979,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5970,7 +4995,6 @@
             },
             properties: { bleachers: "oc_bleachers" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -5987,7 +5011,6 @@
             },
             properties: { "CR Male": "oc_cr" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6004,7 +5027,6 @@
             },
             properties: { "CR Female": "oc_cr" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6021,7 +5043,6 @@
             },
             properties: { bleachers: "oc_bleachers" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6038,7 +5059,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6055,7 +5075,6 @@
             },
             properties: { Pool: "swimming_pool" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6072,7 +5091,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6089,7 +5107,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6106,7 +5123,6 @@
             },
             properties: {},
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6123,7 +5139,6 @@
             },
             properties: { Stairs: "oc_stairs" },
           },
-
           {
             type: "Feature",
             geometry: {
@@ -6140,6 +5155,679 @@
             },
             properties: { Stairs: "oc_stairs" },
           },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9954887, 14.4784247],
+                  [120.99552, 14.4784834],
+                  [120.9956012, 14.4784469],
+                  [120.9955698, 14.4783873],
+                  [120.9954887, 14.4784247],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.995374, 14.4787702],
+                  [120.9954249, 14.4787477],
+                  [120.9954995, 14.4789009],
+                  [120.9954507, 14.4789257],
+                  [120.995374, 14.4787702],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9955124, 14.4789622],
+                  [120.9956045, 14.4789206],
+                  [120.9956302, 14.4789716],
+                  [120.9955387, 14.4790136],
+                  [120.9955124, 14.4789622],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9957471, 14.4789172],
+                  [120.9957202, 14.4788629],
+                  [120.9957801, 14.4788342],
+                  [120.9958099, 14.4788883],
+                  [120.9957471, 14.4789172],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9957932, 14.478767],
+                  [120.9957188, 14.4788042],
+                  [120.9956964, 14.478761],
+                  [120.9957721, 14.4787226],
+                  [120.9957932, 14.478767],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { bleachers: "oc_bleachers" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9953697, 14.4785758],
+                  [120.9955281, 14.4788897],
+                  [120.9955793, 14.4788672],
+                  [120.9954244, 14.47855],
+                  [120.9953697, 14.4785758],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { bleachers: "oc_bleachers" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.99557, 14.4784852],
+                  [120.995608, 14.4784668],
+                  [120.9957373, 14.4787399],
+                  [120.9956969, 14.4787608],
+                  [120.99557, 14.4784852],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { Bleachers: "oc_bleachers" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9956049, 14.4788561],
+                  [120.9957038, 14.478811],
+                  [120.9956735, 14.478775],
+                  [120.9955932, 14.478811],
+                  [120.9956049, 14.4788561],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { bleachers: "oc_bleachers" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9954544, 14.4785597],
+                  [120.9955659, 14.4785086],
+                  [120.9955703, 14.4785512],
+                  [120.9954911, 14.478591],
+                  [120.9954544, 14.4785597],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { stairs: "oc_stairs" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9957883, 14.4788474],
+                  [120.9958251, 14.4788285],
+                  [120.9958454, 14.4788732],
+                  [120.9958095, 14.4788883],
+                  [120.9957883, 14.4788474],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { stairs: "oc_stairs" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9954773, 14.4789785],
+                  [120.9955123, 14.4789623],
+                  [120.9955379, 14.4790138],
+                  [120.995502, 14.4790297],
+                  [120.9954773, 14.4789785],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { stairs: "oc_stairs" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9952856, 14.4785918],
+                  [120.9953258, 14.4785748],
+                  [120.995296, 14.4785151],
+                  [120.9952573, 14.4785328],
+                  [120.9952856, 14.4785918],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9957275, 14.4778595],
+                  [120.9957185, 14.4778403],
+                  [120.9957595, 14.4778241],
+                  [120.9957676, 14.4778444],
+                  [120.9957275, 14.4778595],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.995734, 14.4778294],
+                  [120.9957424, 14.4778267],
+                  [120.9957178, 14.4777672],
+                  [120.9957094, 14.4777707],
+                  [120.995734, 14.4778294],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9954535, 14.47856],
+                  [120.9954439, 14.4785416],
+                  [120.9955558, 14.4784905],
+                  [120.9955653, 14.4785089],
+                  [120.9954535, 14.47856],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9956074, 14.4784681],
+                  [120.9956391, 14.4784525],
+                  [120.9956715, 14.4785172],
+                  [120.9956391, 14.4785323],
+                  [120.9956074, 14.4784681],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9956396, 14.4785302],
+                  [120.9956741, 14.4786061],
+                  [120.9957069, 14.4785908],
+                  [120.995671, 14.478517],
+                  [120.9956396, 14.4785302],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9956746, 14.4786057],
+                  [120.9957076, 14.4785901],
+                  [120.9957378, 14.4786525],
+                  [120.9957037, 14.4786683],
+                  [120.9956746, 14.4786057],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9957379, 14.4787397],
+                  [120.9957716, 14.478722],
+                  [120.9957378, 14.4786529],
+                  [120.9957033, 14.4786682],
+                  [120.9957379, 14.4787397],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { "CR Mamel": "oc_cr" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9954327, 14.4785245],
+                  [120.9954002, 14.4784661],
+                  [120.9954455, 14.4784446],
+                  [120.9954762, 14.4785039],
+                  [120.9954327, 14.4785245],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { "CR Female": "oc_cr" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9954465, 14.4784444],
+                  [120.9954879, 14.4784234],
+                  [120.9955049, 14.4784546],
+                  [120.99552, 14.4784833],
+                  [120.995476, 14.478504],
+                  [120.9954465, 14.4784444],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9952948, 14.4786072],
+                  [120.9953472, 14.4785821],
+                  [120.9954249, 14.4787475],
+                  [120.9953742, 14.4787704],
+                  [120.9952948, 14.4786072],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9953587, 14.4785592],
+                  [120.9954328, 14.4785249],
+                  [120.9954005, 14.4784661],
+                  [120.9953284, 14.478501],
+                  [120.9953587, 14.4785592],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { stairs: "oc_stairs" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9955964, 14.4784377],
+                  [120.9956256, 14.4784248],
+                  [120.9955993, 14.4783717],
+                  [120.9955694, 14.4783867],
+                  [120.9955964, 14.4784377],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9966108, 14.4795763],
+                  [120.9965496, 14.47946],
+                  [120.9964695, 14.4795031],
+                  [120.9965285, 14.4796184],
+                  [120.9966108, 14.4795763],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9965793, 14.4795164],
+                  [120.9966664, 14.4794744],
+                  [120.9966358, 14.479415],
+                  [120.9965501, 14.4794612],
+                  [120.9965793, 14.4795164],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9965794, 14.4795166],
+                  [120.9966107, 14.4795763],
+                  [120.9966944, 14.4795347],
+                  [120.996666, 14.4794743],
+                  [120.9965794, 14.4795166],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9966274, 14.4796252],
+                  [120.9966561, 14.4796774],
+                  [120.9967464, 14.479634],
+                  [120.9967191, 14.4795784],
+                  [120.9966274, 14.4796252],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9966582, 14.4796781],
+                  [120.996689, 14.4797358],
+                  [120.996778, 14.4796937],
+                  [120.9967478, 14.479634],
+                  [120.9966582, 14.4796781],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { "CR Male": "oc_cr" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9966962, 14.4794423],
+                  [120.9967686, 14.4794065],
+                  [120.9967446, 14.4793591],
+                  [120.9966738, 14.4793974],
+                  [120.9966962, 14.4794423],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { "CR Female": "oc_cr" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9967829, 14.4794335],
+                  [120.996744, 14.4793593],
+                  [120.9967889, 14.4793363],
+                  [120.9968274, 14.4794109],
+                  [120.9967829, 14.4794335],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9967105, 14.4794706],
+                  [120.9968274, 14.4794111],
+                  [120.9968281, 14.4794129],
+                  [120.9967112, 14.4794721],
+                  [120.9967105, 14.4794706],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9967436, 14.4795375],
+                  [120.996861, 14.4794791],
+                  [120.9968286, 14.4794133],
+                  [120.9967115, 14.4794726],
+                  [120.9967436, 14.4795375],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9967757, 14.4796015],
+                  [120.996894, 14.4795447],
+                  [120.9969319, 14.4796207],
+                  [120.9968137, 14.4796768],
+                  [120.9967757, 14.4796015],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9967444, 14.4795367],
+                  [120.996861, 14.4794791],
+                  [120.996894, 14.4795439],
+                  [120.9967758, 14.4796008],
+                  [120.9967444, 14.4795367],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9963282, 14.4799299],
+                  [120.9963128, 14.4799008],
+                  [120.9963429, 14.4798903],
+                  [120.9963576, 14.4799211],
+                  [120.9963282, 14.4799299],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9963006, 14.4799391],
+                  [120.9962543, 14.4798468],
+                  [120.9962531, 14.4798477],
+                  [120.9962989, 14.47994],
+                  [120.9963006, 14.4799391],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: { stairs: "oc_stairs" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9962908, 14.4799195],
+                  [120.996317, 14.4799095],
+                  [120.9963281, 14.47993],
+                  [120.9963006, 14.479939],
+                  [120.9962908, 14.4799195],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9959555, 14.4798526],
+                  [120.9959332, 14.4798151],
+                  [120.9959745, 14.4797967],
+                  [120.9959959, 14.4798375],
+                  [120.9959555, 14.4798526],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9955442, 14.4791775],
+                  [120.9959116, 14.4790152],
+                  [120.9958892, 14.4789645],
+                  [120.9955199, 14.4791288],
+                  [120.9955442, 14.4791775],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9955894, 14.4792724],
+                  [120.9959559, 14.4791088],
+                  [120.9959787, 14.4791604],
+                  [120.9956124, 14.4793242],
+                  [120.9955894, 14.4792724],
+                ],
+              ],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.9955444, 14.4791782],
+                  [120.9956001, 14.4791532],
+                  [120.9956441, 14.4792474],
+                  [120.9955883, 14.4792725],
+                  [120.9955444, 14.4791782],
+                ],
+              ],
+            },
+          },
         ],
       };
 
@@ -6149,142 +5837,97 @@
         f2: "Floor 2",
         f3: "Floor 3",
       };
-
       const FLOOR_SHORT = { m: "M", f1: "F1", f2: "F2", f3: "F3" };
-
       const floorBtn = $("floorBtn");
-
       const floorMenu = $("floorMenu");
-
       const floorBadge = $("floorBadge");
-
       const floorChips = floorMenu.querySelectorAll(".floor-chip");
-
       let currentFloor = "m";
-
       let floorGroup = null;
 
       /* Only restrooms, stairs and the chapel get icons on F1. Restrooms pick male/female from the name. */
-
       function getFloorFeatureInfo(props) {
         const key = Object.keys(props)[0];
-
         if (!key) return null;
-
         const kind = String(props[key]).toLowerCase();
-
         if (kind === "oc_cr") {
           const female = /female/i.test(key);
-
           return {
             icon: female ? "fa-solid fa-person-dress" : "fa-solid fa-person",
-
             label: female ? "Women's CR" : "Men's CR",
-
             restroom: true,
           };
         }
-
         if (kind === "oc_chapel")
           return { icon: "fa-solid fa-church", label: "Chapel" };
-
         if (kind === "oc_stairs")
           return { icon: "fa-solid fa-stairs", label: "Stairs" };
-
         return null;
       }
 
       function buildFloorGroup(floorData) {
         const group = L.featureGroup();
-
         L.geoJSON(floorData, {
           interactive: false, // taps fall through to the building underneath
-
           style: (feature) =>
             feature.geometry.type === "LineString"
               ? { className: "floor-line", weight: 2.5, lineCap: "round" }
               : { className: "floor-room", weight: 1.5 },
-
           onEachFeature: (feature, layer) => {
             const info = getFloorFeatureInfo(feature.properties || {});
-
             if (!info || feature.geometry.type === "LineString") return;
-
             let center;
-
             try {
               center = layer.getBounds().getCenter();
             } catch (e) {
               return;
             }
-
             const icon = L.divIcon({
               className: "map-label-marker floor-marker",
-
               html: `<div class="map-label-pill floor-pill${info.restroom ? " floor-restroom" : ""}" aria-hidden="true">
-
                        <div class="map-label-icon"><i class="${info.icon}"></i></div>
-
                        <span class="map-label-text${labelsVisible ? "" : " hide-label"}">${escapeHtml(info.label)}</span>
-
                      </div>`,
-
               iconSize: null,
-
               iconAnchor: [15, 15],
             });
-
             L.marker(center, {
               icon,
-
               interactive: false,
-
               keyboard: false,
-
               zIndexOffset: 500,
             }).addTo(group);
           },
         }).eachLayer((l) => group.addLayer(l));
-
         return group;
       }
 
       function setFloorMenu(open) {
         floorMenu.classList.toggle("open", open);
-
         floorBtn.setAttribute("aria-expanded", String(open));
       }
 
       function setFloor(id) {
         if (id === currentFloor) return;
-
         currentFloor = id;
 
         if (floorGroup) {
           oc_map.removeLayer(floorGroup);
-
           floorGroup = null;
         }
-
         if (id === "f1") {
           floorGroup = buildFloorGroup(floor1Data).addTo(oc_map);
         }
 
         const onMain = id === "m";
-
         document.body.classList.toggle("floor-active", !onMain);
-
         floorBtn.classList.toggle("active", !onMain);
-
         floorBadge.textContent = FLOOR_SHORT[id];
-
         floorBadge.classList.toggle("show", !onMain);
-
         floorBtn.setAttribute(
           "aria-label",
           "Choose floor, current: " + FLOOR_NAMES[id],
         );
-
         floorChips.forEach((chip) =>
           chip.setAttribute("aria-checked", String(chip.dataset.floor === id)),
         );
@@ -6297,96 +5940,67 @@
       floorBtn.addEventListener("click", () =>
         setFloorMenu(!floorMenu.classList.contains("open")),
       );
-
       floorChips.forEach((chip) =>
         chip.addEventListener("click", () => {
           setFloor(chip.dataset.floor);
-
           setFloorMenu(false);
         }),
       );
-
       document.addEventListener("click", (e) => {
         if (!e.target.closest("#floorControl")) setFloorMenu(false);
       });
-
       document.addEventListener(
         "keydown",
-
         (e) => {
           if (e.key === "Escape" && floorMenu.classList.contains("open")) {
             setFloorMenu(false);
-
             floorBtn.focus();
-
             e.stopImmediatePropagation();
           }
         },
-
         true,
       );
 
       /* Search Combobox */
-
       let visibleBuildings = [];
-
       let activeIndex = -1;
-
       let buildingRoomHits = new Map();
-
       let pendingRoomFocus = null;
 
       /* Room search: lets "registrar", "accounting", "507" or "chow" find the ELO building */
-
       const normalizeText = (t) =>
         String(t)
           .toLowerCase()
-
           .replace(/['’`]/g, "")
-
           .replace(/[^a-z0-9]+/g, " ")
-
           .trim();
 
       const tokenize = (t) => normalizeText(t).split(" ").filter(Boolean);
 
       /* A query word matches a word of the text if it is a prefix of it, or the other way round,
-
          or both share a long stem (accounting / accountancy). */
-
       function tokenMatches(q, w) {
         if (w.startsWith(q)) return true;
-
         if (q.length >= 3 && q.startsWith(w) && w.length >= 3) return true;
-
         if (q.length >= 5 && w.length >= 5) {
           let i = 0;
-
           while (i < q.length && i < w.length && q[i] === w[i]) i++;
-
           if (i >= 6) return true;
         }
-
         return false;
       }
 
       const ROOM_INDEX = {};
-
       Object.keys(BUILDING_DIRECTORY).forEach((key) => {
         ROOM_INDEX[key] = [];
-
         BUILDING_DIRECTORY[key].forEach((sec, si) => {
           sec.groups.forEach((grp) => {
             grp.rooms.forEach(([num, name]) => {
               ROOM_INDEX[key].push({
                 section: si,
-
                 sectionLabel: sec.label,
-
                 num,
-
                 name,
-
                 tokens: tokenize(
                   `${num} ${name} ${sec.label} ${grp.label || ""}`,
                 ),
@@ -6398,53 +6012,38 @@
 
       function findRoomHits(building, rawQuery) {
         const key = getDirectoryKey(building);
-
         if (!key) return [];
-
         const qTokens = tokenize(rawQuery);
-
         if (!qTokens.length) return [];
-
         const titleTokens = tokenize(`${building.title} ${building.id || ""}`);
-
         return ROOM_INDEX[key].filter((r) => {
           const hay = titleTokens.concat(r.tokens);
-
           return qTokens.every((q) => hay.some((w) => tokenMatches(q, w)));
         });
       }
 
       function roomHitLabel(r) {
         const where = r.sectionLabel;
-
         if (r.num && r.name) return `${r.num} ${r.name} (${where})`;
-
         if (r.num)
           return `${/^\d+$/.test(r.num) ? "Room " : ""}${r.num} (${where})`;
-
         return `${r.name} (${where})`;
       }
 
       function setDropdownOpen(open) {
         searchDropdown.classList.toggle("active", open);
-
         searchInput.setAttribute("aria-expanded", String(open));
-
         if (!open) setActiveOption(-1);
       }
 
       function setActiveOption(index) {
         const options = buildingsList.querySelectorAll(".building-item");
-
         options.forEach((el) => el.classList.remove("is-active"));
-
         activeIndex = index;
 
         if (index >= 0 && options[index]) {
           options[index].classList.add("is-active");
-
           searchInput.setAttribute("aria-activedescendant", options[index].id);
-
           options[index].scrollIntoView({ block: "nearest" });
         } else {
           searchInput.removeAttribute("aria-activedescendant");
@@ -6453,140 +6052,99 @@
 
       function renderBuildingsDropdown(filterText = "") {
         buildingsList.replaceChildren();
-
         activeIndex = -1;
-
         searchInput.removeAttribute("aria-activedescendant");
 
         const query = filterText.toLowerCase();
-
         buildingRoomHits = new Map();
-
         visibleBuildings = campusBuildings.filter((b) => {
           if (b.title.toLowerCase().includes(query)) return true;
-
           const hits = findRoomHits(b, filterText);
-
           if (hits.length) buildingRoomHits.set(b, hits);
-
           return hits.length > 0;
         });
 
         if (visibleBuildings.length === 0) {
           const li = document.createElement("li");
-
           li.className = "no-building-found";
-
           li.setAttribute("role", "option");
-
           li.setAttribute("aria-disabled", "true");
-
           li.textContent = `No building matching "${filterText}"`;
-
           buildingsList.appendChild(li);
-
           return;
         }
 
         visibleBuildings.forEach((building, i) => {
           const li = document.createElement("li");
-
           li.className = "building-item";
-
           li.id = `building-option-${i}`;
-
           li.setAttribute("role", "option");
 
           const { iconClass, iconColor } = getBuildingIconInfo(building.title);
 
           const iconWrapper = document.createElement("div");
-
           iconWrapper.className = "map-label-icon";
-
           iconWrapper.style.color = iconColor;
 
           const icon = document.createElement("i");
-
           icon.className = iconClass;
-
           icon.setAttribute("aria-hidden", "true");
-
           iconWrapper.appendChild(icon);
 
           const label = document.createElement("span");
-
           label.className = "building-item-label";
-
           label.textContent = building.title;
 
           const textWrap = document.createElement("div");
-
           textWrap.className = "building-item-text";
-
           textWrap.appendChild(label);
 
           const hits = buildingRoomHits.get(building);
-
           if (hits && hits.length) {
             const sub = document.createElement("span");
-
             sub.className = "building-item-sub";
-
             const shown = hits.slice(0, 3).map(roomHitLabel).join(" • ");
-
             sub.textContent =
               shown + (hits.length > 3 ? ` • +${hits.length - 3} more` : "");
-
             textWrap.appendChild(sub);
           }
 
           li.append(iconWrapper, textWrap);
-
           li.addEventListener("click", (e) => {
             e.stopPropagation();
-
             selectBuilding(building, (hits && hits[0]) || null);
           });
-
           buildingsList.appendChild(li);
         });
       }
 
       function selectBuilding(building, roomHit = null) {
         setDropdownOpen(false);
-
         pendingRoomFocus = roomHit;
-
         searchInput.value = building.title;
-
         updateSearchIconState();
 
         if (building.coords) {
           oc_map.flyTo([building.coords.lat, building.coords.lng], 19, {
             animate: true,
-
             duration: 1.2,
           });
         }
-
         openBottomSheet(building);
       }
 
       function updateSearchIconState() {
         if (searchInput.value.trim().length > 0) {
           searchIcon.className = "fa-solid fa-xmark";
-
           searchBtn.setAttribute("aria-label", "Clear search");
         } else {
           searchIcon.className = "fa-solid fa-magnifying-glass";
-
           searchBtn.setAttribute("aria-label", "Search");
         }
       }
 
       function openDropdown() {
         renderBuildingsDropdown(searchInput.value.trim());
-
         setDropdownOpen(true);
       }
 
@@ -6594,7 +6152,6 @@
 
       searchInput.addEventListener("input", () => {
         updateSearchIconState();
-
         openDropdown();
       });
 
@@ -6603,58 +6160,42 @@
 
         if (e.key === "ArrowDown" || e.key === "ArrowUp") {
           e.preventDefault();
-
           if (!isOpen) openDropdown();
-
           if (!visibleBuildings.length) return;
-
           const step = e.key === "ArrowDown" ? 1 : -1;
-
           setActiveOption(
             (activeIndex + step + visibleBuildings.length) %
               visibleBuildings.length,
           );
         } else if (e.key === "Enter") {
           if (!isOpen || !visibleBuildings.length) return;
-
           e.preventDefault();
-
           if (activeIndex >= 0) {
             const b = visibleBuildings[activeIndex];
-
             const h = buildingRoomHits.get(b);
-
             selectBuilding(b, (h && h[0]) || null);
           } else if (searchInput.value.trim()) {
             const b = visibleBuildings[0];
-
             const h = buildingRoomHits.get(b);
-
             selectBuilding(b, (h && h[0]) || null);
           }
         } else if (e.key === "Escape" && isOpen) {
           e.stopPropagation();
-
           setDropdownOpen(false);
         }
       });
 
       searchBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-
         if (searchInput.value.trim().length > 0) {
           searchInput.value = "";
-
           updateSearchIconState();
-
           openDropdown();
-
           searchInput.focus();
         } else if (searchDropdown.classList.contains("active")) {
           setDropdownOpen(false);
         } else {
           openDropdown();
-
           searchInput.focus();
         }
       });
@@ -6666,7 +6207,6 @@
       });
 
       /* Perimeter Mask */
-
       function getMaskStyle(dark) {
         return dark
           ? { fillColor: "#000000", fillOpacity: 0.65 }
@@ -6674,7 +6214,6 @@
       }
 
       let maskPolygon = null;
-
       const perimeterFeature = geojsonData.features.find(
         (f) => f.properties && f.properties.perimeter,
       );
@@ -6686,65 +6225,46 @@
 
         const worldOuterBounds = [
           [90, -180],
-
           [90, 180],
-
           [-90, 180],
-
           [-90, -180],
         ];
 
         maskPolygon = L.polygon([worldOuterBounds, perimeterLatLngs], {
           color: "transparent",
-
           interactive: false,
-
           ...getMaskStyle(isDarkMode),
         }).addTo(oc_map);
       }
 
       /* Drawer Menu */
-
       function openMenu() {
         sideDrawer.classList.add("active");
-
         navOverlay.classList.add("active");
-
         menuToggle.setAttribute("aria-expanded", "true");
-
         closeDrawer.focus();
       }
 
       function closeMenu(restoreFocus = true) {
         const hadFocusInside = sideDrawer.contains(document.activeElement);
-
         sideDrawer.classList.remove("active");
-
         navOverlay.classList.remove("active");
-
         menuToggle.setAttribute("aria-expanded", "false");
-
         if (restoreFocus && hadFocusInside) menuToggle.focus();
       }
 
       menuToggle.addEventListener("click", openMenu);
-
       closeDrawer.addEventListener("click", () => closeMenu());
-
       navOverlay.addEventListener("click", () => closeMenu());
 
       /* Feedback Form */
-
       const feedbackForm = $("feedbackForm");
-
       const sendFeedbackBtn = $("sendFeedbackBtn");
-
       const SEND_LABEL =
         '<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Send Feedback';
 
       $("feedbackLink").addEventListener("click", () => {
         openModal(feedbackModal, $("userEmail"));
-
         closeMenu(false);
       });
 
@@ -6756,32 +6276,24 @@
         e.preventDefault();
 
         sendFeedbackBtn.disabled = true;
-
         sendFeedbackBtn.innerHTML =
           '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
 
         const email = $("userEmail").value;
-
         const subject = $("feedbackSubject").value;
-
         const message = $("feedbackMessage").value;
 
         const templateParams = {
           name: email,
-
           email: email,
-
           subject: subject,
-
           message: message,
         };
 
         const request = window.emailjs
           ? emailjs.send(
               EMAIL_CONFIG.serviceId,
-
               EMAIL_CONFIG.templateId,
-
               templateParams,
             )
           : Promise.reject(new Error("EmailJS is unavailable"));
