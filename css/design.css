@@ -1750,6 +1750,9 @@ body.dark-theme .toast {
   width: var(--control-size);
   padding: 4px;
   box-sizing: border-box;
+  max-height: calc(100dvh - 280px); /* ten chips: scroll on short screens */
+  overflow-y: auto;
+  scrollbar-width: none;
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
@@ -1766,6 +1769,10 @@ body.dark-theme .toast {
     opacity 0.2s ease,
     transform 0.2s ease,
     visibility 0s linear 0.2s;
+}
+
+.floor-menu::-webkit-scrollbar {
+  display: none;
 }
 
 .floor-menu.open {

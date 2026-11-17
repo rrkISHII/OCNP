@@ -380,6 +380,72 @@
           >
             F3
           </button>
+          <button
+            type="button"
+            class="floor-chip"
+            role="radio"
+            aria-checked="false"
+            data-floor="f4"
+            aria-label="Floor 4"
+            title="Floor 4"
+          >
+            F4
+          </button>
+          <button
+            type="button"
+            class="floor-chip"
+            role="radio"
+            aria-checked="false"
+            data-floor="f5"
+            aria-label="Floor 5"
+            title="Floor 5"
+          >
+            F5
+          </button>
+          <button
+            type="button"
+            class="floor-chip"
+            role="radio"
+            aria-checked="false"
+            data-floor="f6"
+            aria-label="Floor 6"
+            title="Floor 6"
+          >
+            F6
+          </button>
+          <button
+            type="button"
+            class="floor-chip"
+            role="radio"
+            aria-checked="false"
+            data-floor="f7"
+            aria-label="Floor 7"
+            title="Floor 7"
+          >
+            F7
+          </button>
+          <button
+            type="button"
+            class="floor-chip"
+            role="radio"
+            aria-checked="false"
+            data-floor="f8"
+            aria-label="Floor 8"
+            title="Floor 8"
+          >
+            F8
+          </button>
+          <button
+            type="button"
+            class="floor-chip"
+            role="radio"
+            aria-checked="false"
+            data-floor="f9"
+            aria-label="Floor 9"
+            title="Floor 9"
+          >
+            F9
+          </button>
         </div>
         <button
           type="button"
@@ -4546,7 +4612,7 @@
         });
       });
 
-      /* Floors: M is the campus map above; F1, F2 and F3 draw their interior detail on top. */
+      /* Floors: M is the campus map above; F1 to F9 draw their interior detail on top. */
       const floor1Data = {
         type: "FeatureCollection",
         features: [
@@ -6978,7 +7044,7 @@
         ],
       };
 
-      /* Floor 3 plan (floor_3.geojson): interior shapes only, same clean-up as floor 2. */
+      /* Floor 3 plan (floor_3_1.geojson), reused for floor 4 minus DPRO: interior shapes only, same clean-up as floor 2. */
       const floor3Data = {
         type: "FeatureCollection",
         features: [
@@ -7037,7 +7103,7 @@
               coordinates: [
                 [
                   [120.995864, 14.478551],
-                  [120.995843, 14.478507],
+                  [120.9958427, 14.4785075],
                   [120.995906, 14.478477],
                   [120.995927, 14.478522],
                   [120.995864, 14.478551],
@@ -7052,11 +7118,11 @@
               type: "Polygon",
               coordinates: [
                 [
-                  [120.995818, 14.478458],
+                  [120.9958188, 14.4784579],
                   [120.995793, 14.478406],
                   [120.995857, 14.478376],
                   [120.995883, 14.478429],
-                  [120.995818, 14.478458],
+                  [120.9958188, 14.4784579],
                 ],
               ],
             },
@@ -7649,11 +7715,11 @@
               type: "Polygon",
               coordinates: [
                 [
-                  [120.995843, 14.478506],
-                  [120.995819, 14.478458],
+                  [120.9958427, 14.4785071],
+                  [120.9958183, 14.4784574],
                   [120.995883, 14.478429],
                   [120.995906, 14.478477],
-                  [120.995843, 14.478506],
+                  [120.9958427, 14.4785071],
                 ],
               ],
             },
@@ -7664,7 +7730,7 @@
             geometry: {
               type: "LineString",
               coordinates: [
-                [120.995871, 14.478494],
+                [120.9958417, 14.4785075],
                 [120.995778, 14.478537],
               ],
             },
@@ -7675,7 +7741,7 @@
             geometry: {
               type: "LineString",
               coordinates: [
-                [120.995822, 14.478456],
+                [120.9958183, 14.4784584],
                 [120.995755, 14.478488],
               ],
             },
@@ -7820,13 +7886,241 @@
         ],
       };
 
+      /* Floors 5-9 share one plan (floor5-9.geojson): interior shapes only, same clean-up as floor 2. */
+      const floor5to9Data = {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996565, 14.478819],
+                  [120.996536, 14.478756],
+                  [120.996718, 14.478673],
+                  [120.996747, 14.478734],
+                  [120.996565, 14.478819],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.99616, 14.479008],
+                  [120.996127, 14.478942],
+                  [120.996471, 14.478786],
+                  [120.996503, 14.478852],
+                  [120.99616, 14.479008],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996211, 14.479111],
+                  [120.99618, 14.479047],
+                  [120.996522, 14.47889],
+                  [120.996552, 14.478952],
+                  [120.996211, 14.479111],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996522, 14.47889],
+                  [120.996545, 14.47888],
+                  [120.996561, 14.478914],
+                  [120.996571, 14.47891],
+                  [120.996579, 14.478906],
+                  [120.996563, 14.478871],
+                  [120.996585, 14.478861],
+                  [120.996616, 14.478923],
+                  [120.996552, 14.478952],
+                  [120.996522, 14.47889],
+                ],
+              ],
+            },
+            properties: { stairs: "oc_stairs" },
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996485, 14.478814],
+                  [120.996471, 14.478786],
+                  [120.996536, 14.478757],
+                  [120.996549, 14.478786],
+                  [120.996485, 14.478814],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996748, 14.478734],
+                  [120.996719, 14.478674],
+                  [120.9969, 14.478591],
+                  [120.99693, 14.478648],
+                  [120.996748, 14.478734],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996616, 14.478923],
+                  [120.996585, 14.478861],
+                  [120.996952, 14.478691],
+                  [120.996983, 14.478752],
+                  [120.996616, 14.478923],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996146, 14.479015],
+                  [120.996122, 14.479027],
+                  [120.996098, 14.478983],
+                  [120.996123, 14.478971],
+                  [120.996146, 14.479015],
+                ],
+              ],
+            },
+            properties: {},
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996141, 14.479066],
+                  [120.996159, 14.479057],
+                  [120.996178, 14.479096],
+                  [120.996183, 14.479094],
+                  [120.996164, 14.479055],
+                  [120.99618, 14.479047],
+                  [120.996211, 14.47911],
+                  [120.996173, 14.479128],
+                  [120.996141, 14.479066],
+                ],
+              ],
+            },
+            properties: { stairs: "oc_stairs" },
+          },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [120.996098, 14.478983],
+                  [120.996087, 14.47896],
+                  [120.996127, 14.478942],
+                  [120.996138, 14.478964],
+                  [120.996098, 14.478983],
+                ],
+              ],
+            },
+            properties: {},
+          },
+        ],
+      };
+
+      /* Floor 4 reuses the floor 3 plan, but DPRO only has 3 floors, so any shape
+         whose center falls inside the DPRO footprint is left out. */
+      const floor4Data = (() => {
+        const dpro = geojsonData.features.find(
+          (f) => f.properties && f.properties.DPRO,
+        );
+        const ring = dpro.geometry.coordinates[0];
+        const inside = (x, y) => {
+          let hit = false;
+          for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            const [xi, yi] = ring[i];
+            const [xj, yj] = ring[j];
+            if (
+              yi > y !== yj > y &&
+              x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
+            )
+              hit = !hit;
+          }
+          return hit;
+        };
+        const center = (g) => {
+          const pts = g.type === "Polygon" ? g.coordinates[0] : g.coordinates;
+          return [
+            pts.reduce((s, c) => s + c[0], 0) / pts.length,
+            pts.reduce((s, c) => s + c[1], 0) / pts.length,
+          ];
+        };
+        return {
+          type: "FeatureCollection",
+          features: floor3Data.features.filter(
+            (f) => !inside(...center(f.geometry)),
+          ),
+        };
+      })();
+
       const FLOOR_NAMES = {
         m: "Main",
         f1: "Floor 1",
         f2: "Floor 2",
         f3: "Floor 3",
+        f4: "Floor 4",
+        f5: "Floor 5",
+        f6: "Floor 6",
+        f7: "Floor 7",
+        f8: "Floor 8",
+        f9: "Floor 9",
       };
-      const FLOOR_SHORT = { m: "M", f1: "F1", f2: "F2", f3: "F3" };
+      const FLOOR_SHORT = {
+        m: "M",
+        f1: "F1",
+        f2: "F2",
+        f3: "F3",
+        f4: "F4",
+        f5: "F5",
+        f6: "F6",
+        f7: "F7",
+        f8: "F8",
+        f9: "F9",
+      };
       const floorBtn = $("floorBtn");
       const floorMenu = $("floorMenu");
       const floorBadge = $("floorBadge");
@@ -7904,9 +8198,17 @@
           oc_map.removeLayer(floorGroup);
           floorGroup = null;
         }
-        const floorData = { f1: floor1Data, f2: floor2Data, f3: floor3Data }[
-          id
-        ];
+        const floorData = {
+          f1: floor1Data,
+          f2: floor2Data,
+          f3: floor3Data,
+          f4: floor4Data, // floor 3 plan without DPRO
+          f5: floor5to9Data,
+          f6: floor5to9Data,
+          f7: floor5to9Data,
+          f8: floor5to9Data,
+          f9: floor5to9Data,
+        }[id];
         if (floorData) {
           floorGroup = buildFloorGroup(floorData).addTo(oc_map);
         }
