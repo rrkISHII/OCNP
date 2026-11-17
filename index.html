@@ -1,130 +1,186 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Olivarez Navigation Portal</title>
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/welcome.css">
-</head>
-<body>
 
-    <div class="welcome-container">
-        <!-- Top Heading -->
-        <div class="heading-group">
-            <h2 class="sub-title">WELCOME TO</h2>
-            <h1 class="main-title">OLIVAREZ</h1>
-        </div>
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
-        <!-- Logo Placeholder Container -->
-        <div class="logo-placeholder" id="logoContainer">
-            <!-- Replace this div with <img> when your image is ready -->
-        </div>
+    <!-- My styles -->
+    <link rel="stylesheet" href="css/welcome.css" />
+  </head>
+  <body>
+    <!-- Background -->
+    <div class="bg-photo"></div>
+    <div class="bg-glow"></div>
 
-        <!-- Subheading -->
-        <div class="portal-title">
-            <h2>NAVIGATION<br>PORTAL</h2>
-        </div>
+    <!-- Main screen -->
+    <main class="welcome-container">
+      <img src="images/logo.png" alt="Olivarez College logo" class="logo" />
 
-        <!-- Action Button that triggers popup -->
-        <button type="button" class="enter-btn" id="enterBtn">ENTER</button>
-    </div>
+      <div class="heading-group">
+        <h2 class="sub-title">WELCOME</h2>
+        <h1 class="main-title">OLIVAREZ</h1>
+        <h2 class="portal-title">NAVIGATION PORTAL</h2>
+      </div>
 
-    <!-- Location Permission Popup Modal (Styled like main_page.html modals) -->
+      <button type="button" class="enter-btn" id="enterBtn">ENTER</button>
+    </main>
+
+    <!-- Location popup (hidden until ENTER is clicked) -->
     <div class="modal-overlay" id="locationModal">
-        <div class="feedback-window">
-            <div class="modal-header">
-                <h3><i class="fa-solid fa-location-dot"></i> WELCOME TO OLIVAREZ</h3>
-                <button class="modal-close-btn" id="closeModalX" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="info-modal-body">
-                <p class="modal-intro" style="margin-bottom: 12px;">
-                    For a better experience, your device will need to use <strong>Location Accuracy</strong>.
-                </p>
-                <p class="modal-sub-intro" style="margin-bottom: 8px; font-weight: 600;">The following settings should be on:</p>
-                
-                <div class="setting-item" style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-crosshairs" style="color: #0B793D;"></i> <strong>Device Location</strong>
-                </div>
-
-                <p class="modal-description" style="margin-bottom: 14px; font-size: 13px; color: #555; line-height: 1.5;">
-                    <strong>Location Accuracy</strong> provides a more accurate location for apps and services. Google periodically processes information about device sensors and wireless signals to improve location accuracy and location-based features.
-                </p>
-
-                <p class="modal-footer-note" style="font-size: 12px; text-decoration: underline; color: #666; margin-bottom: 20px;">
-                    You can change this at any time in your Location Settings.
-                </p>
-            </div>
-
-            <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button class="text-btn" id="noThanksBtn" style="background: none; border: none; font-size: 14px; font-weight: 600; cursor: pointer; color: #666; padding: 10px 16px;">NO THANKS</button>
-                <button class="send-btn" id="turnOnBtn" style="width: auto; padding: 10px 20px; margin-top: 0;">TURN ON</button>
-            </div>
+      <div class="feedback-window">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-location-dot"></i> WELCOME TO OLIVAREZ</h3>
+          <button class="modal-close-btn" id="closeModalX" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
+
+        <div class="info-modal-body">
+          <p class="modal-intro">
+            For a better experience, your device will need to use
+            <strong>Location Accuracy</strong>.
+          </p>
+          <p class="modal-sub-intro">The following settings should be on:</p>
+
+          <div class="setting-item">
+            <i class="fa-solid fa-crosshairs"></i>
+            <strong>Device Location</strong>
+          </div>
+
+          <p class="modal-description">
+            <strong>Location Accuracy</strong> provides a more accurate location
+            for apps and services. Google periodically processes information
+            about device sensors and wireless signals to improve location
+            accuracy and location-based features.
+          </p>
+
+          <p class="modal-footer-note">
+            You can change this at any time in your Location Settings.
+          </p>
+        </div>
+
+        <p id="locNote" class="loc-note" role="alert" hidden></p>
+
+        <div class="modal-actions">
+          <button class="text-btn" id="noThanksBtn">NO THANKS</button>
+          <button class="send-btn" id="turnOnBtn">TURN ON</button>
+        </div>
+      </div>
     </div>
 
     <script>
-        const enterBtn = document.getElementById('enterBtn');
-        const locationModal = document.getElementById('locationModal');
-        const closeModalX = document.getElementById('closeModalX');
-        const noThanksBtn = document.getElementById('noThanksBtn');
-        const turnOnBtn = document.getElementById('turnOnBtn');
+      const enterBtn = document.getElementById("enterBtn");
+      const locationModal = document.getElementById("locationModal");
+      const closeModalX = document.getElementById("closeModalX");
+      const noThanksBtn = document.getElementById("noThanksBtn");
+      const turnOnBtn = document.getElementById("turnOnBtn");
+      const locNote = document.getElementById("locNote");
 
-        // Show popup when ENTER is clicked
-        enterBtn.addEventListener('click', () => {
-            locationModal.classList.add('active');
-        });
+      /* A QR code opens this page as index.html?from=<building>.
+           Whatever the visitor chooses, that query is passed on to main_page.html untouched,
+           plus loc=on / loc=off so the map knows which mode to start in. */
+      let decided = false; // only one choice per visit (stops a late GPS reply overriding NO THANKS)
 
-        // Close popup on X click
-        closeModalX.addEventListener('click', () => {
-            locationModal.classList.remove('active');
-        });
+      function goToMap(mode) {
+        if (decided) return;
+        decided = true;
+        const params = new URLSearchParams(window.location.search);
+        params.set("loc", mode);
+        try {
+          sessionStorage.setItem("ocnpLoc", mode);
+        } catch (e) {}
+        window.location.href = "main_page.html?" + params.toString();
+      }
 
-        // Proceed to main page on NO THANKS
-        noThanksBtn.addEventListener('click', () => {
-            window.location.href = 'main_page.html';
-        });
+      function showNote(message) {
+        locNote.textContent = message;
+        locNote.hidden = false;
+      }
 
-        // Request browser geolocation when TURN ON is clicked
-        turnOnBtn.addEventListener('click', () => {
-            if ('geolocation' in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        // Success: GPS is ON and permission granted
-                        localStorage.setItem('userLat', position.coords.latitude);
-                        localStorage.setItem('userLng', position.coords.longitude);
-                        localStorage.setItem('locationEnabled', 'true');
+      function setTurnOn(label, disabled) {
+        turnOnBtn.textContent = label;
+        turnOnBtn.disabled = disabled;
+      }
 
-                        window.location.href = 'main_page.html';
-                    },
-                    (error) => {
-                        // Location error handling
-                        console.warn("Geolocation error:", error);
+      function openPopup() {
+        locNote.hidden = true;
+        setTurnOn("TURN ON", false);
+        locationModal.classList.add("active");
+      }
 
-                        if (error.code === error.POSITION_UNAVAILABLE) {
-                            alert("Device location is turned off. Please turn on Location/GPS in your phone's drop-down menu and try again.");
-                        } else if (error.code === error.PERMISSION_DENIED) {
-                            alert("Location access was denied in your browser settings.");
-                        } else {
-                            alert("Unable to acquire location signal. Proceeding to map.");
-                        }
+      enterBtn.addEventListener("click", openPopup);
 
-                        // Still proceed to main page
-                        window.location.href = 'main_page.html';
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
-                );
-            } else {
-                alert("Geolocation is not supported by your browser.");
-                window.location.href = 'main_page.html';
+      // Back button (page restored from cache): unlock the popup again
+      window.addEventListener("pageshow", (e) => {
+        if (e.persisted) {
+          decided = false;
+          setTurnOn("TURN ON", false);
+        }
+      });
+
+      // Close popup on X click
+      closeModalX.addEventListener("click", () => {
+        locationModal.classList.remove("active");
+      });
+
+      // Location OFF: go to the map. The ?from=<building> in the QR link is the starting point.
+      noThanksBtn.addEventListener("click", () => goToMap("off"));
+
+      // Location blocked or unsupported: say so, then carry on with the QR starting point
+      function continueWithoutLocation(message) {
+        setTurnOn("CONTINUING…", true);
+        showNote(message);
+        setTimeout(() => goToMap("off"), 2500);
+      }
+
+      // Location ON: ask the browser for permission / GPS, then open the map in live-location mode
+      turnOnBtn.addEventListener("click", () => {
+        locNote.hidden = true;
+
+        if (!("geolocation" in navigator)) {
+          continueWithoutLocation(
+            "This browser does not support location. Continuing with the QR code location.",
+          );
+          return;
+        }
+
+        setTurnOn("LOCATING…", true);
+
+        navigator.geolocation.getCurrentPosition(
+          () => {
+            // GPS is on and permission is granted. main_page.html keeps tracking from here.
+            goToMap("on");
+          },
+          (error) => {
+            console.warn("Geolocation error:", error);
+
+            if (error.code === error.PERMISSION_DENIED) {
+              continueWithoutLocation(
+                "Location is blocked for this site in your browser settings. Continuing with the QR code location.",
+              );
+              return;
             }
-        });
+
+            // GPS switched off or no signal yet: stay here so they can fix it and try again
+            setTurnOn("TURN ON", false);
+            showNote(
+              "We couldn't get a location signal. Turn on Location / GPS in your phone's drop-down menu, then tap TURN ON again, or tap NO THANKS to continue with the QR code.",
+            );
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0,
+          },
+        );
+      });
     </script>
-</body>
+  </body>
 </html>
