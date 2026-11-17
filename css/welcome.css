@@ -1,19 +1,22 @@
-/* ===== Basic reset ===== */
+/* Basic reset: every element sizes by its border box and starts with no margin or padding. */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Colours used on this page: the neon green and the dark background. */
 :root {
   --green: #12e06b;
   --dark-bg: #02100a;
 }
 
+/* The dark colour also shows behind the page while it loads or overscrolls. */
 html {
   background-color: var(--dark-bg);
 }
 
+/* Fill the screen width; no sideways scrolling. Text is white on the dark background. */
 html,
 body {
   width: 100%;
@@ -23,8 +26,8 @@ body {
   color: #fff;
 }
 
-/* ===== Background ===== */
-
+/* Background layer: the campus photo (images/campus.jpg) under a dark green gradient so the text is easy to read.
+   If the photo is missing, the radial gradient on its own is shown. */
 .bg-photo {
   position: fixed;
   inset: 0;
@@ -40,7 +43,7 @@ body {
     radial-gradient(ellipse at 50% 20%, #0b5a31 0%, #04261a 45%, #02100a 100%);
 }
 
-/* soft green light behind the logo */
+/* Soft green light behind the logo, and a dark fade at the bottom. It never blocks taps. */
 .bg-glow {
   position: fixed;
   inset: 0;
@@ -59,7 +62,8 @@ body {
     );
 }
 
-/* ===== Page layout ===== */
+/* Page layout: a centred column (logo at the top, titles in the middle, ENTER button at the bottom)
+   that fills the whole screen height. */
 .welcome-container {
   display: flex;
   flex-direction: column;
@@ -74,7 +78,7 @@ body {
   text-align: center;
 }
 
-/* ===== Logo ===== */
+/* The college logo with a green glow. It grows with the screen width within a limit. */
 .logo {
   width: clamp(190px, 52vw, 300px);
   height: auto;
@@ -83,7 +87,7 @@ body {
     drop-shadow(0 0 25px rgba(18, 224, 107, 0.5));
 }
 
-/* ===== Titles ===== */
+/* Block holding the three title lines. */
 .heading-group {
   display: flex;
   flex-direction: column;
@@ -91,6 +95,7 @@ body {
   width: 100%;
 }
 
+/* "WELCOME": small, widely spaced letters. */
 .sub-title {
   font-size: clamp(15px, 4.2vw, 26px);
   font-weight: 500;
@@ -100,6 +105,7 @@ body {
   text-shadow: 0 0 12px rgba(18, 224, 107, 0.6);
 }
 
+/* "OLIVAREZ": the big title with a white and green glow. */
 .main-title {
   font-size: clamp(38px, 12.5vw, 110px);
   font-weight: 900;
@@ -112,7 +118,7 @@ body {
     0 0 30px rgba(18, 224, 107, 0.55);
 }
 
-/* green line under OLIVAREZ */
+/* The green line under OLIVAREZ. */
 .main-title::after {
   content: "";
   display: block;
@@ -123,6 +129,7 @@ body {
   box-shadow: 0 0 14px var(--green);
 }
 
+/* "NAVIGATION PORTAL": small spaced letters under the title. */
 .portal-title {
   font-size: clamp(11px, 3.1vw, 20px);
   font-weight: 500;
@@ -133,7 +140,7 @@ body {
   text-shadow: 0 0 10px rgba(18, 224, 107, 0.5);
 }
 
-/* ===== ENTER button ===== */
+/* The ENTER button: dark green with a glowing green outline. */
 .enter-btn {
   width: 62%;
   max-width: 270px;
@@ -154,7 +161,7 @@ body {
   transition: all 0.25s ease;
 }
 
-/* only on devices with a real mouse, so it doesn't stick after a tap */
+/* Hover glow only on devices with a real mouse, so it does not stay stuck after a tap on a phone. */
 @media (hover: hover) {
   .enter-btn:hover {
     background: rgba(18, 224, 107, 0.2);
@@ -166,13 +173,14 @@ body {
   }
 }
 
+/* Pressed: fills solid green. */
 .enter-btn:active {
   background: var(--green);
   color: var(--dark-bg);
   transform: scale(0.98);
 }
 
-/* ===== Bigger screens (laptop / desktop) ===== */
+/* Bigger screens (laptop / desktop): centre everything and size by screen height. */
 @media (min-width: 900px) {
   .welcome-container {
     justify-content: center;
@@ -196,7 +204,7 @@ body {
   }
 }
 
-/* ===== Short screens (phone sideways) ===== */
+/* Short screens (phone held sideways): smaller logo and title so everything fits. */
 @media (max-height: 560px) {
   .welcome-container {
     justify-content: center;
@@ -212,7 +220,10 @@ body {
   }
 }
 
-/* ===== Popup (modal) ===== */
+/* ==========================================================
+   Location popup (modal)
+   Dark overlay that centres the white window. Adding `.active` fades it in.
+   ========================================================== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -234,6 +245,7 @@ body {
   visibility: visible;
 }
 
+/* The white popup window; it scrolls if the screen is very short. */
 .feedback-window {
   background: #fff;
   color: #333;
@@ -254,6 +266,7 @@ body {
   transform: translateY(0);
 }
 
+/* Popup title row with the close button. */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -271,6 +284,7 @@ body {
   gap: 8px;
 }
 
+/* Round X button. */
 .modal-close-btn {
   background: none;
   border: none;
@@ -290,7 +304,7 @@ body {
   background: #f0f0f0;
 }
 
-/* popup text */
+/* Popup text. */
 .info-modal-body {
   font-size: 14px;
   line-height: 1.5;
@@ -306,6 +320,7 @@ body {
   font-weight: 600;
 }
 
+/* The "Device Location" row with its icon. */
 .setting-item {
   display: flex;
   align-items: center;
@@ -331,7 +346,7 @@ body {
   text-decoration: underline;
 }
 
-/* error / info note shown above the popup buttons (hidden until needed) */
+/* Error / info note above the popup buttons (hidden until needed). */
 .loc-note {
   margin-bottom: 14px;
   font-size: 13px;
@@ -339,13 +354,14 @@ body {
   color: #b3261e;
 }
 
-/* popup buttons */
+/* Popup buttons, aligned to the right. */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 }
 
+/* NO THANKS: plain text button. */
 .text-btn {
   min-height: 44px;
   background: none;
@@ -357,6 +373,7 @@ body {
   cursor: pointer;
 }
 
+/* TURN ON: green button. */
 .send-btn {
   min-height: 44px;
   background: #0b793d;
@@ -378,7 +395,7 @@ body {
   background: #085a2d;
 }
 
-/* while the button says LOCATING… / CONTINUING… */
+/* While the button says LOCATING… or CONTINUING… */
 .send-btn:disabled {
   opacity: 0.6;
   cursor: default;

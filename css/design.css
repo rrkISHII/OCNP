@@ -1,19 +1,25 @@
+/* Font: Plus Jakarta Sans from Google Fonts. The fallbacks in `font-family` below are used until it loads. */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 /* ==========================================================
    Design tokens (light theme)
+   All colours, sizes and layers are defined once here and used everywhere
+   through var(--name). The dark theme overrides the colours further down.
    ========================================================== */
 :root {
+  /* Brand green. */
   --green: #0b793d;
   --green-dark: #085a2d;
   --green-tint: #f0f7f3;
 
+  /* Surfaces: page background, cards and panels, hover states, form fields. */
   --bg-page: #f4f4f9;
   --surface: #ffffff;
   --surface-hover: #f0f0f0;
   --surface-muted: #f0f4f1;
   --surface-field: #ffffff;
 
+  /* Text colours, from strongest to faintest. */
   --text: #2c2c2c;
   --text-strong: #111111;
   --text-muted: #555555;
@@ -21,16 +27,19 @@
   --text-label: #333333;
   --text-on-green: #ffffff;
 
-  --accent: var(--green); /* green for icons/text on surfaces */
-  --accent-on-fill: #ffffff; /* text on filled accent buttons */
+  /* Accent: the colour of icons, selected items and focus rings (text on a filled accent button is --accent-on-fill). */
+  --accent: var(--green);
+  --accent-on-fill: #ffffff;
   --border: #eeeeee;
   --border-field: #8a8a8a;
   --placeholder-bg: #e0e0e0;
   --item-active: #f0f7f3;
 
+  /* Shadow colours. */
   --shadow-sm: rgba(0, 0, 0, 0.25);
   --shadow-md: rgba(0, 0, 0, 0.15);
 
+  /* Layout sizes. --trip-height is how tall the search bar grows to while a route is showing; --peek-height is kept in sync by the page script (the collapsed bottom sheet). */
   --header-height: 56px;
   --header-gap: 12px;
   --header-offset: calc(
@@ -38,9 +47,10 @@
       env(safe-area-inset-top, 0px)
   );
   --control-size: 44px;
-  --trip-height: 104px; /* the search bar grows to this while a route is showing */
-  --peek-height: 190px; /* kept in sync by the page script */
+  --trip-height: 104px;
+  --peek-height: 190px;
 
+  /* Stacking order, lowest to highest: map, header, dropdown, map buttons, drawer, bottom sheet, popups. */
   --z-map: 1;
   --z-header: 1000;
   --z-dropdown: 1001;
@@ -51,42 +61,39 @@
   --z-sheet: 2501;
   --z-modal: 3000;
 
-  /* Floor layers: same green family as the buildings, but lighter so they read as a separate layer */
+  /* Floor layers: same green family as the buildings, but lighter so they read as a separate layer. */
   --floor: #558b2f;
   --floor-fill: rgba(139, 195, 74, 0.38);
   --floor-on: #ffffff;
 }
 
+/* Dark theme: the same tokens with dark values. The page script adds the `dark-theme` class to <body>. */
 body.dark-theme {
   --bg-page: #121212;
   --surface: #1e1e1e;
   --surface-hover: #333333;
   --surface-muted: #333333;
   --surface-field: #2a2a2a;
-
   --text: #eaeaea;
   --text-strong: #ffffff;
   --text-muted: #cccccc;
   --text-faint: #aaaaaa;
   --text-label: #dddddd;
-
   --accent: #4caf50;
   --accent-on-fill: #121212;
   --border: #3a3a3a;
   --border-field: #777777;
   --placeholder-bg: #333333;
   --item-active: #2d3e33;
-
   --floor: #9ccc65;
   --floor-fill: rgba(156, 204, 101, 0.28);
   --floor-on: #121212;
-
   --shadow-sm: rgba(0, 0, 0, 0.5);
   --shadow-md: rgba(0, 0, 0, 0.5);
 }
 
 /* ==========================================================
-   Global mobile resets & Typography
+   Global mobile resets and typography
    ========================================================== */
 * {
   box-sizing: border-box;
@@ -94,6 +101,7 @@ body.dark-theme {
   padding: 0;
 }
 
+/* Fill the screen and never scroll the page itself (only the map and panels move). */
 html,
 body {
   position: relative;
@@ -117,12 +125,13 @@ body {
   color: var(--text);
 }
 
+/* Buttons use the page font and react to taps right away (no double-tap zoom delay). */
 button {
   font-family: inherit;
   touch-action: manipulation;
 }
 
-/* High-contrast, punchy heading styles */
+/* High-contrast, punchy heading styles. */
 h2,
 h3,
 .drawer-header h2,
@@ -133,12 +142,13 @@ h3,
   font-weight: 800;
 }
 
-/* Visible keyboard focus */
+/* Visible keyboard focus. */
 :focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
+/* For people who ask their device for less motion: make every animation and transition effectively instant. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -158,6 +168,7 @@ h3,
   z-index: var(--z-map);
 }
 
+/* Smooth movement when the map pans, except while the finger is dragging or zooming. */
 .leaflet-map-pane {
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
@@ -169,6 +180,7 @@ h3,
   transition: none;
 }
 
+/* The compass arrow (rotate control): smaller, with a soft shadow; inverted to white in dark mode. */
 .leaflet-control-rotate .leaflet-control-rotate-arrow {
   width: 24px;
   height: 24px;
@@ -181,6 +193,7 @@ body.dark-theme .leaflet-control-rotate .leaflet-control-rotate-arrow {
   filter: invert(100%);
 }
 
+/* Leaflet's bottom corner (attribution) moves up out of the way when the bottom sheet is peeking. */
 .leaflet-bottom {
   transition: bottom 0.4s ease;
 }
@@ -189,7 +202,7 @@ body.sheet-peek .leaflet-bottom {
   bottom: var(--peek-height);
 }
 
-/* Map marker label pill */
+/* Map marker label pill: the round icon on each building, with its name beside it when labels are on. */
 .map-label-marker {
   background: transparent;
   border: none;
@@ -217,10 +230,12 @@ body.sheet-peek .leaflet-bottom {
   transition: padding 0.2s ease;
 }
 
+/* Pill grows to fit the name when the label is visible. */
 .map-label-pill:has(.map-label-text:not(.hide-label)) {
   padding-right: 10px;
 }
 
+/* The round icon inside the pill. */
 .map-label-icon {
   width: 26px;
   height: 26px;
@@ -233,6 +248,7 @@ body.sheet-peek .leaflet-bottom {
   flex-shrink: 0;
 }
 
+/* The building name; `.hide-label` hides it. */
 .map-label-text {
   font-size: 12.5px;
   font-weight: 700;
@@ -244,6 +260,7 @@ body.sheet-peek .leaflet-bottom {
   display: none;
 }
 
+/* Dark-mode colours for Leaflet's own popups and attribution text. */
 body.dark-theme .leaflet-popup-content-wrapper,
 body.dark-theme .leaflet-popup-tip {
   background: var(--surface);
@@ -261,6 +278,8 @@ body.dark-theme .leaflet-control-attribution a {
 
 /* ==========================================================
    Floating search header
+   The rounded bar at the top. It holds two layers: the search box and the trip card.
+   data-mode="search" shows the search box; data-mode="trip" grows the bar and shows the trip card.
    ========================================================== */
 .app-header {
   position: absolute;
@@ -289,6 +308,7 @@ body.dark-theme .leaflet-control-attribution a {
     0 0 0 2px var(--accent);
 }
 
+/* Both layers sit on top of each other and cross-fade when the mode changes. */
 .header-search,
 .trip-card {
   position: absolute;
@@ -329,6 +349,7 @@ body.dark-theme .leaflet-control-attribution a {
   transform: none;
 }
 
+/* Trip card: back arrow, the From / To rows joined by a dotted line, and the time / distance on the right. */
 .trip-back {
   width: var(--control-size);
   height: var(--control-size);
@@ -348,6 +369,7 @@ body.dark-theme .leaflet-control-attribution a {
   background: var(--surface-hover);
 }
 
+/* The two rows (From, To) with the connecting line drawn by ::before. */
 .trip-points {
   position: relative;
   display: flex;
@@ -394,6 +416,7 @@ body.dark-theme .leaflet-control-attribution a {
   font-weight: 700;
 }
 
+/* Marker at the start of each row: a ring for From (amber for a building, blue for live location) and a blue pin for To. */
 .trip-marker {
   flex: none;
   width: 12px;
@@ -418,6 +441,7 @@ body.dark-theme .leaflet-control-attribution a {
   border-color: #2563eb;
 }
 
+/* Walking time and distance. */
 .trip-summary {
   display: flex;
   flex-direction: column;
@@ -445,11 +469,13 @@ body.dark-theme .leaflet-control-attribution a {
   white-space: nowrap;
 }
 
+/* While a route is showing, hide Leaflet's top controls so they do not sit under the trip card. */
 body.trip-mode .leaflet-top.leaflet-left,
 body.trip-mode .leaflet-top.leaflet-right {
   top: calc(var(--header-offset) + var(--trip-height) - var(--header-height));
 }
 
+/* Text for screen readers only: hidden visually but still read aloud. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -462,6 +488,7 @@ body.trip-mode .leaflet-top.leaflet-right {
   border: 0;
 }
 
+/* Hamburger button. */
 .menu-btn {
   background: none;
   border: none;
@@ -482,6 +509,7 @@ body.trip-mode .leaflet-top.leaflet-right {
   background-color: var(--surface-hover);
 }
 
+/* Search box and its clear / search button. */
 .search-container {
   display: flex;
   align-items: center;
@@ -537,6 +565,7 @@ body.trip-mode .leaflet-top.leaflet-right {
   display: none;
 }
 
+/* Dropdown under the search bar. It slides open when it has the `.active` class. */
 .search-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -564,6 +593,7 @@ body.trip-mode .leaflet-top.leaflet-right {
   transform: translateY(0);
 }
 
+/* The list of matching buildings (and rooms) inside the dropdown. */
 .buildings-list {
   list-style: none;
   padding: 8px;
@@ -603,6 +633,7 @@ body.trip-mode .leaflet-top.leaflet-right {
   line-height: 1.35;
 }
 
+/* A room that matched the search is highlighted in the building's room list. */
 .floor-rooms li.room-hit {
   background: var(--item-active);
   border-radius: 8px;
@@ -611,6 +642,7 @@ body.trip-mode .leaflet-top.leaflet-right {
   margin: 0 -8px;
 }
 
+/* Hover / pressed / keyboard-selected option in the dropdown. */
 .building-item:active,
 .building-item:hover,
 .building-item.is-active {
@@ -622,6 +654,7 @@ body.trip-mode .leaflet-top.leaflet-right {
   outline-offset: -2px;
 }
 
+/* "No building matching ..." message. */
 .no-building-found {
   padding: 16px;
   text-align: center;
@@ -632,6 +665,8 @@ body.trip-mode .leaflet-top.leaflet-right {
 
 /* ==========================================================
    Bottom-right map controls
+   A column of round buttons: floor picker, labels toggle, my location.
+   They move up when the bottom sheet is peeking.
    ========================================================== */
 .map-controls-container {
   position: fixed;
@@ -649,6 +684,7 @@ body.sheet-peek .map-controls-container {
   bottom: calc(var(--peek-height) + 16px);
 }
 
+/* One round map button; `.active` fills it with the accent colour. */
 .map-control-btn {
   width: var(--control-size);
   height: var(--control-size);
@@ -683,6 +719,7 @@ body.sheet-peek .map-controls-container {
 
 /* ==========================================================
    Side drawer
+   The hamburger menu slides in from the left, over a dark overlay.
    ========================================================== */
 .nav-overlay {
   position: fixed;
@@ -735,6 +772,7 @@ body.sheet-peek .map-controls-container {
   outline-color: #ffffff;
 }
 
+/* Drawer title bar and close button. */
 .drawer-header {
   display: flex;
   justify-content: space-between;
@@ -769,6 +807,7 @@ body.sheet-peek .map-controls-container {
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* The list of drawer actions (theme, feedback, about, attributions). */
 .drawer-menu {
   list-style: none;
 }
@@ -807,7 +846,9 @@ body.sheet-peek .map-controls-container {
 }
 
 /* ==========================================================
-   Modals
+   Modals (popups)
+   Dark overlay that centres a window. Adding `.active` fades it in.
+   Used by the feedback form, the success message and the info popup.
    ========================================================== */
 .modal-overlay {
   position: fixed;
@@ -833,6 +874,7 @@ body.sheet-peek .map-controls-container {
   visibility: visible;
 }
 
+/* The white window itself (also used by the info popup). */
 .feedback-window {
   background: var(--surface);
   color: var(--text);
@@ -855,6 +897,7 @@ body.sheet-peek .map-controls-container {
   transform: translateY(0);
 }
 
+/* Window title row with a close button. */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -893,6 +936,7 @@ body.sheet-peek .map-controls-container {
   background: var(--surface-hover);
 }
 
+/* Text inside the info popup (About / Attributions). */
 .info-modal-body {
   font-size: 14.5px;
   font-weight: 450;
@@ -910,7 +954,8 @@ body.sheet-peek .map-controls-container {
   color: var(--accent);
   text-decoration: underline;
   font-weight: 600;
-  word-break: break-all;
+  /* Long links may wrap, but words like "Stadia Maps" are no longer split mid-word. */
+  overflow-wrap: anywhere;
 }
 
 .break-email {
@@ -921,6 +966,7 @@ body.sheet-peek .map-controls-container {
   margin-top: 2px;
 }
 
+/* Attributions list: an icon followed by the credit text. */
 .info-list {
   list-style: none;
   padding: 0;
@@ -946,6 +992,7 @@ body.sheet-peek .map-controls-container {
   word-break: break-word;
 }
 
+/* Feedback form: labelled fields. */
 .form-group {
   margin-bottom: 14px;
 }
@@ -993,6 +1040,7 @@ body.sheet-peek .map-controls-container {
   min-height: 90px;
 }
 
+/* Green "Send Feedback" button (dimmed while sending). */
 .send-btn {
   width: 100%;
   min-height: var(--control-size);
@@ -1021,6 +1069,7 @@ body.sheet-peek .map-controls-container {
   cursor: wait;
 }
 
+/* The small "Feedback Sent!" window with its check icon and OK button. */
 .success-popup {
   background: var(--surface);
   color: var(--text);
@@ -1080,6 +1129,7 @@ body.sheet-peek .map-controls-container {
 
 /* ==========================================================
    Leaflet control overrides
+   Place the library's own controls (zoom, rotate compass) below the floating header.
    ========================================================== */
 .leaflet-top.leaflet-left {
   top: var(--header-offset);
@@ -1115,6 +1165,8 @@ body.dark-theme .leaflet-control-rotate {
 
 /* ==========================================================
    Full-height swipeable bottom sheet
+   The sheet is as tall as the screen and is moved with translateY by the page script:
+   fully down = closed, partly up = peek (only the drag area shows), up = expanded.
    ========================================================== */
 .bottom-sheet-overlay {
   position: fixed;
@@ -1134,6 +1186,7 @@ body.dark-theme .leaflet-control-rotate {
   visibility: visible;
 }
 
+/* The sheet itself. */
 .bottom-sheet {
   position: fixed;
   top: 0;
@@ -1154,6 +1207,7 @@ body.dark-theme .leaflet-control-rotate {
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.3, 1);
 }
 
+/* The always-visible strip: handle, building name, close button, badges and the Go button. */
 .sheet-drag-area {
   padding: 4px 20px calc(12px + env(safe-area-inset-bottom, 0px)) 20px;
   cursor: grab;
@@ -1183,6 +1237,7 @@ body.dark-theme .leaflet-control-rotate {
   margin: 0 auto;
 }
 
+/* Name row and badge row. */
 .sheet-header {
   display: flex;
   flex-direction: column;
@@ -1247,6 +1302,7 @@ body.dark-theme .leaflet-control-rotate {
   min-height: 28px;
 }
 
+/* Walking time / distance badges (shown only for the building the route leads to). */
 .sheet-stat-badge {
   display: inline-flex;
   align-items: center;
@@ -1269,6 +1325,7 @@ body.dark-theme .sheet-stat-badge {
   color: #4caf50;
 }
 
+/* Small pill buttons in the header ("Start from here"). */
 .sheet-pill-btn {
   margin-left: auto;
   display: inline-flex;
@@ -1294,6 +1351,7 @@ body.dark-theme .sheet-stat-badge {
   background: var(--surface-hover);
 }
 
+/* Wide green button: Go to Destination / Clear route / You are here. */
 .destination-btn {
   width: 100%;
   min-height: var(--control-size);
@@ -1312,6 +1370,7 @@ body.dark-theme .sheet-stat-badge {
   letter-spacing: -0.01em;
 }
 
+/* Scrollable area below the drag area: photos, description, room list. */
 .sheet-content {
   padding: 8px 20px calc(20px + env(safe-area-inset-bottom, 0px)) 20px;
   overflow-y: auto;
@@ -1319,6 +1378,7 @@ body.dark-theme .sheet-stat-badge {
   flex: 1;
 }
 
+/* Row of up to three photos; a grey placeholder shows where a photo is missing. */
 .sheet-images-gallery {
   display: flex;
   gap: 10px;
@@ -1362,6 +1422,7 @@ body.dark-theme .sheet-stat-badge {
   font-size: 20px;
 }
 
+/* Building description text. */
 .sheet-description {
   font-size: 14.5px;
   color: var(--text-muted);
@@ -1369,7 +1430,7 @@ body.dark-theme .sheet-stat-badge {
   font-weight: 450;
 }
 
-/* Floor dropdowns (ELO building) */
+/* Floor dropdowns (the room directory): one collapsible <details> per floor with its rooms. */
 .floor-list {
   margin-top: 18px;
   display: flex;
@@ -1425,6 +1486,7 @@ body.dark-theme .sheet-stat-badge {
   transform: rotate(180deg);
 }
 
+/* Room rows: a number badge followed by the room name. */
 .floor-rooms {
   list-style: none;
   margin: 0;
@@ -1484,6 +1546,7 @@ body.dark-theme .sheet-stat-badge {
   pointer-events: none;
 }
 
+/* Small pills under the search bar, e.g. "You are at ELO" with an X to clear it. */
 .status-chip {
   pointer-events: auto;
   align-self: flex-start;
@@ -1543,6 +1606,7 @@ body.dark-theme .sheet-stat-badge {
   background: var(--surface-hover);
 }
 
+/* Short message that pops up near the bottom (above the sheet while it is peeking). */
 .toast {
   position: fixed;
   left: 50%;
@@ -1580,6 +1644,7 @@ body.dark-theme .toast {
   color: #111111;
 }
 
+/* Pulsing ring on the building the route starts from. */
 .here-marker span {
   display: block;
   width: 44px;
@@ -1590,6 +1655,7 @@ body.dark-theme .toast {
   animation: herePulse 1.8s ease-out infinite;
 }
 
+/* The pulse animation. */
 @keyframes herePulse {
   0% {
     transform: scale(0.6);
@@ -1607,13 +1673,15 @@ body.dark-theme .toast {
   }
 }
 
+/* Disabled state of the destination button ("You are here"). */
 .destination-btn:disabled {
   background: var(--surface-muted);
   color: var(--text-muted);
   cursor: default;
 }
 
-/* Google-Maps style location marker: blue dot plus a beam that follows the phone's heading */
+/* Google-Maps style location marker: a blue dot plus a beam that follows the phone's heading.
+   --gm-heading is set by the page script. */
 .gm-user {
   background: none;
   border: none;
@@ -1665,7 +1733,7 @@ body.dark-theme .toast {
   box-sizing: border-box;
 }
 
-/* invisible probes used by the script to measure rotation */
+/* Invisible probes used by the script to measure how the map is rotated. */
 .gm-user .gm-center,
 .gm-user .gm-axis,
 .gm-ref {
@@ -1694,6 +1762,7 @@ body.dark-theme .toast {
   color: #4285f4;
 }
 
+/* Chequered-flag marker at the destination. */
 .route-end-marker span {
   display: flex;
   align-items: center;
@@ -1718,6 +1787,7 @@ body.dark-theme .toast {
   height: var(--control-size);
 }
 
+/* Small badge on the floor button that shows the selected floor (F1, F2, ...). */
 .floor-badge {
   position: absolute;
   top: -5px;
@@ -1742,18 +1812,20 @@ body.dark-theme .toast {
   display: flex;
 }
 
+/* The popup menu of floors: a vertical pill that opens upward from the floor button (F3 on top, M next to the button). Scrolls if the screen is short. */
 .floor-menu {
-  /* Vertical stack that opens upward from the floor button (F3 on top, M next to the button) */
   position: absolute;
   bottom: calc(100% + 10px);
   right: 0;
   width: var(--control-size);
   padding: 4px;
   box-sizing: border-box;
-  max-height: calc(100dvh - 280px); /* ten chips: scroll on short screens */
+  /* Ten chips: scroll instead of running off a short screen. */
+  max-height: calc(100dvh - 280px);
   overflow-y: auto;
   scrollbar-width: none;
   display: flex;
+  /* Reversed so F3 sits on top and M is next to the button. */
   flex-direction: column-reverse;
   align-items: center;
   gap: 4px;
@@ -1771,10 +1843,12 @@ body.dark-theme .toast {
     visibility 0s linear 0.2s;
 }
 
+/* Hide the scrollbar in Safari / Chrome (Firefox uses scrollbar-width above). */
 .floor-menu::-webkit-scrollbar {
   display: none;
 }
 
+/* Open state: fade and slide into place. */
 .floor-menu.open {
   opacity: 1;
   visibility: visible;
@@ -1786,6 +1860,7 @@ body.dark-theme .toast {
     visibility 0s;
 }
 
+/* One floor choice; the selected one is filled with the accent colour. */
 .floor-chip {
   width: 36px;
   height: 36px;
@@ -1818,17 +1893,18 @@ body.dark-theme .toast {
   outline-offset: 2px;
 }
 
-/* Building icons are hidden while browsing a floor */
+/* Building icons are hidden while browsing a floor. */
 body.floor-active .map-label-marker:not(.floor-marker) {
   display: none;
 }
 
-/* Floor icons always sit above the building markers */
+/* Floor icons always sit above the building markers. */
 .floor-marker {
   opacity: 1;
   visibility: visible;
 }
 
+/* Room outlines and walls of the selected floor. */
 path.floor-room {
   stroke: var(--floor);
   fill: var(--floor-fill);
@@ -1840,6 +1916,7 @@ path.floor-line {
   fill: none;
 }
 
+/* Icons for restrooms, stairs and the chapel on a floor. */
 .floor-pill .map-label-icon {
   background-color: var(--floor);
   color: var(--floor-on);
