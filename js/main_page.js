@@ -679,13 +679,6 @@ const geoLayer = L.geoJSON(geojsonData, {
         fillColor: "#8a8a8a",
         fillOpacity: 0.15,
       };
-    } else if (props.PARKING) {
-      return {
-        color: "#2196F3",
-        weight: 1.5,
-        fillColor: "#2196F3",
-        fillOpacity: 0.25,
-      };
     }
     return {
       color: "#0B793D",
@@ -2907,12 +2900,13 @@ $("aboutLink").addEventListener("click", () => {
   showInfo(
     "fa-solid fa-circle-info",
     "About Us / Contact Us",
-    `
-          <p><strong>Olivarez College Navigation Portal</strong></p>
-          <p>We are a group of 2nd-year Information Technology students from Olivarez College. We created the Olivarez College Navigation Portal as our project requirement for our IT subject.</p>
-          <p>Our goal is to build a simple, user-friendly system that helps students, teachers, and visitors easily go around campus. Through this project, we aim to apply what we have learned in class and create a practical tool that makes campus navigation faster and hassle-free for everyone.</p>
-          <p><strong>Contact:</strong><br><a href="mailto:${CONTACT_EMAIL}" class="break-email">${CONTACT_EMAIL}</a></p>
-      `,
+    `     
+      <p><strong>Olivarez College Navigation Portal</strong></p>
+      <p style="text-align: justify;">OCNP is an ongoing student-developed project designed to help students, faculty, staff, and visitors easily locate buildings, classrooms, offices, and other campus facilities.</p>
+      <p><strong>Our Mission</strong></p>
+      <p style="text-align: justify;">To develop an accessible, accurate, and easy-to-use campus navigation system that will help students, faculty, staff, and visitors explore Olivarez College more conveniently. Through continuous development and improvements, OCNP aims to provide a better and more reliable campus navigation experience.</p>
+      <p><strong>Contact:</strong><br><a href="mailto:${CONTACT_EMAIL}" class="break-email">${CONTACT_EMAIL}</a></p>
+    `,
   );
 });
 
