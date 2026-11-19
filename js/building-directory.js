@@ -26,7 +26,6 @@ const BUILDING_DIRECTORY = {
       groups: [
         G([
           ["", "Cashier"],
-          ["", "Accounting Office"],
           ["", "Board Room"],
           ["201", "Registrar's Office"],
           ["202", "Office of the Vice President"],

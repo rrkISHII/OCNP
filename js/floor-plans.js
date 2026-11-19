@@ -7,9 +7,6 @@
 // A feature whose property is oc_cr, oc_stairs or oc_chapel also gets an icon
 // (see getFloorFeatureInfo in main_page.js). The campus buildings themselves are not
 // repeated here - they come from campus-geojson.js.
-//
-// This file is NOT listed in main_page.html. loadFloorPlans() in main_page.js adds it the
-// first time the floor menu is opened, so visitors who never open a floor do not download it.
 // ==========================================================
 //
 // Floor 1.
@@ -3477,7 +3474,10 @@ const floor4Data = (() => {
     for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
       const [xi, yi] = ring[i];
       const [xj, yj] = ring[j];
-      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi)
+      if (
+        yi > y !== yj > y &&
+        x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
+      )
         hit = !hit;
     }
     return hit;
@@ -3495,6 +3495,8 @@ const floor4Data = (() => {
   // Floor 3's shapes, minus any whose center is inside DPRO.
   return {
     type: "FeatureCollection",
-    features: floor3Data.features.filter((f) => !inside(...center(f.geometry))),
+    features: floor3Data.features.filter(
+      (f) => !inside(...center(f.geometry)),
+    ),
   };
 })();
