@@ -237,7 +237,7 @@
               type="email"
               id="userEmail"
               class="form-input"
-              placeholder="Enter your email here."
+              placeholder="enter your email here"
               autocomplete="email"
               required
             />
@@ -251,7 +251,7 @@
               type="text"
               id="feedbackSubject"
               class="form-input"
-              placeholder="Enter subject here."
+              placeholder="enter subject here"
               required
             />
           </div>
@@ -264,7 +264,7 @@
             <textarea
               id="feedbackMessage"
               class="form-textarea"
-              placeholder="Enter your feedback here."
+              placeholder="enter your feedback here..."
               rows="4"
               required
             ></textarea>
@@ -602,11 +602,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@tomickigrzegorz/leaflet-rotate@0.3.0/dist/leaflet-rotate.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3.12.1/dist/email.min.js"></script>
 
-    <!-- Map data: campus buildings and paths, room directory, floor plans.
-         These must load before main_page.js, which uses them. -->
+    <!-- Map data: campus buildings and paths, and the room directory.
+         These must load before main_page.js, which uses them.
+         (js/floor-plans.js is not listed here: main_page.js downloads it the
+         first time a floor is opened.) -->
     <script src="js/campus-geojson.js"></script>
     <script src="js/building-directory.js"></script>
-    <script src="js/floor-plans.js"></script>
 
     <!-- Page logic: map, search, routing, live location, floors, popups -->
     <script src="js/main_page.js"></script>
